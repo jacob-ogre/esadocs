@@ -7,3 +7,5 @@ library(shinydashboard)
 library(shinyBS)
 
 elastic::connect()
+
+searched <- FALSE

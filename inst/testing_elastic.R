@@ -79,6 +79,7 @@ system(paste("open", test5$`_source`$pdf))
 test6 <- Search(index = "esadocs",
                 type = "federal_register",
                 q = "fish and wildlife service",
+                fields = c("txt", "pdf", "basename"),
                 asdf = TRUE)$hits$hits
 dim(test6)
 test6$`_source`$txt
@@ -92,8 +93,8 @@ dim(test7)
 
 test8 <- Search(index = "esadocs",
                 type = "federal_register",
-                q = "recovery AND unit",
-                fields = "pdf",
+                q = "recovery unit",
+                fields = c("txt", "pdf"),
                 asdf = TRUE)$hits$hits
 dim(test8)
 system(paste("open", test8$fields$pdf[1][[1]][1]))
