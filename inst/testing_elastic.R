@@ -97,5 +97,65 @@ test8 <- Search(index = "esadocs",
                 fields = c("txt", "pdf"),
                 asdf = TRUE)$hits$hits
 dim(test8)
+
+test8 <- cbind(test8[, 1:4], test8$fields)
+
+hi <- filter(test8, `_score` > 0.01)
+hi
+
 system(paste("open", test8$fields$pdf[1][[1]][1]))
 system(paste("open", test8$fields$pdf[2][[1]][1]))
+
+body <- '{
+  "query": {
+    "match": {
+      "raw_txt": {
+        "query_string": {
+          "query": "chiricahua"
+        }
+      }
+    }
+  },
+  "highlight": {
+    "fields": {
+      "raw_txt": {
+        "highlight_query": {
+          "bool": {
+            "must": {
+              "match": {
+                "content": {
+                  "query": "chiricahua"
+                }
+              }
+            }
+          }
+        },
+        "fragment_size": 50,
+        "number_of_fragments": 1
+      }
+    }
+  }
+}'
+
+t9 <- Search(index = "esadocs", type = "federal_register", body = body)
+
+qq <- Search(index = c("us", "gb"), asdf = TRUE)$hits$hits
+qq
+
+qq <- Search(index = c("us", "gb"), size = 5, asdf = TRUE)$hits$hits
+
+qq <- Search(index = c("us", "gb"),
+             q = "mary",
+             asdf = TRUE)$hits$hits
+
+aq <- '{
+  "bool": {
+    "must":     { "match": { "tweet": "elasticsearch" }},
+    "must_not": { "match": { "name":  "mary" }}
+  }
+}'
+
+qq <- Search(index = c("us", "gb"), q = aq, asdf = TRUE)$hits$hits
+qq
+
+validate("esadocs", body = body)

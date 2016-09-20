@@ -12,7 +12,8 @@ sidebar <- dashboardSidebar(disable = TRUE)
 body <- dashboardBody(
   div(class = "outer",
     tags$head(
-      HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>"),
+      HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400'
+           rel='stylesheet' type='text/css'>"),
       tags$style(HTML("
         hr {
           border-color: #808080 !important;
@@ -72,7 +73,8 @@ body <- dashboardBody(
                               size = "default"
                      )
                 )
-            )
+            ),
+            helpText("Use ';' to separate fields for targeted searches.")
           ),
           column(2)
         ),

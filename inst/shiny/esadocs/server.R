@@ -1,7 +1,6 @@
 # BSD_2_clause
 
 shinyServer(function(input, output) {
-
   output$n_docs <- renderText({
     tmp <- Search(index = "esadocs",
                   fields = c("txt", "pdf"),
@@ -14,6 +13,7 @@ shinyServer(function(input, output) {
     x <- stringr::str_replace_all(x,
                                   pattern = "\\{|\\}|;",
                                   replacement = " ")
+    observe({ print(x) })
     return(x)
   }
 
@@ -58,14 +58,25 @@ shinyServer(function(input, output) {
     if(!is.na(n_match())) {
       lapply(1:n_match(), function(i) {
         box(
-          title = cur_res()$fields$basename[i],
+          title = div(cur_res()$fields$basename[i],
+                      style = "color:blue;font-size:larger;font-weight:bold"),
           status = "primary",
           width = 12,
-          h2(cur_res()$`_score`[i]),
-          p(cur_res()$fields$txt[i]),
-          p(cur_res()$fields$pdf[i])
+          div(span("Text doc:", style = "font-weight:bold"),
+              cur_res()$fields$txt[i]),
+          div(span("PDF doc:", style = "font-weight:bold"),
+              cur_res()$fields$pdf[i]),
+          helpText(paste("Score:", cur_res()$`_score`[i]))
         )
       })
+    } else if(class(cur_res()) == "list") {
+      box(
+        title = div("No matches",
+                    style = "color:orange;font-size:larger"),
+        status = "warning",
+        width = 12,
+        p("Please try another search.")
+      )
     } else {
       h3("No results.")
     }

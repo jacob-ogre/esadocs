@@ -8,7 +8,9 @@
 #' @seealso if any see alsos
 #' @export
 #' @examples
-#' one or more lines to demo the function
+#' \dontrun{
+#' make_json("~/txts", "~/pdfs")
+#' }
 make_json <- function(txt_dir, pdf_dir) {
   pdfs <- data.frame(pdf = dir(pdf_dir, pattern = "*.pdf", recursive = TRUE),
                      stringsAsFactors = FALSE)
@@ -27,7 +29,5 @@ make_json <- function(txt_dir, pdf_dir) {
   dat <- dplyr::left_join(txts, pdfs, by = "basename")
   dat$raw_txt <- raw_txt
   return(dat)
-  # dat_json <- jsonlite::toJSON(dat, pretty = TRUE)
-  # return(dat_json)
 }
 

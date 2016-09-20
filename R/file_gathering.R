@@ -1,3 +1,4 @@
+# BSD_2_clause
 
 #' A helper function to find relevant PDFs in one directory and copy to another
 #'
