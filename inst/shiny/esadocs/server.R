@@ -37,7 +37,6 @@ shinyServer(function(input, output) {
       params = list(my_field = "raw_txt", my_value = cur_input(), my_size = 20L)
     )
     cur_mats <- Search_template(body = body)$hits$hits
-    observe({ print(length(cur_mats))})
     if(length(cur_mats) > 0) {
       res_df <- result_asdf(cur_mats)
       res_df$highlight <- get_highlight(cur_mats)
@@ -70,13 +69,9 @@ shinyServer(function(input, output) {
 
   output$hits <- renderUI({
     if(is.null(cur_res())) {
-      div(div(class = "search-res",
-        h3("No matches; please enter a search.")
-      ))
+      h4("No matches; please enter a search.")
     } else if(is.na(cur_res())) {
-      div(div(class = "search-res",
-        h3("No matches; please try another search.")
-      ))
+      h4("No matches; please try another search.")
     } else if(!is.na(cur_res())) {
       lapply(1:n_match(), function(i) {
         div(div(class = "search-res",

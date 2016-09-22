@@ -81,30 +81,27 @@ body <- dashboardBody(fluidPage(
                      )
                 )
             ),
-            helpText("Use ';' to separate fields for targeted searches.")
+            helpText(textOutput("n_docs"), style="font-size:smaller")
           ),
-          column(2)
+          column(2,
+            img(src = "DOW_logo_small.png")
+          )
         ),
 
-        br(), hr(), br(),
+        # br(),
+        hr(),
 
         fluidRow(
           column(8,
-            div(style = "font-size:150%;font-weight:bold;padding-bottom:10px",
-                textOutput("n_hits")),
+            helpText(textOutput("n_hits")),
             uiOutput("hits")
           ),
           column(4,
             fluidRow(
               column(12,
-                helpText(textOutput("n_docs"))
-              )
-            ),
-            fluidRow(
-              column(12,
                 shinyjs::hidden(div(id = "selector",
                   selectInput("summary_plot",
-                              label = NULL,
+                              label = "Summarize by:",
                               choices = c("Score", "Date")
                   ))
                 ),
