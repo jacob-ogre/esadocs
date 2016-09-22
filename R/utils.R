@@ -29,5 +29,5 @@ make_file_paths <- function(x) {
 #' }
 load_doc_text <- function(path) {
   if(!file.exists(path)) return(NA)
-  return(paste(readLines(path), collapse = "\n"))
+  return(paste(readLines(path), collapse = " "))
 }

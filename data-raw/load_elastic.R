@@ -3,6 +3,7 @@
 library(digest)
 library(dplyr)
 library(ecosscraper)
+library(elastic)
 library(tools)
 
 data("ecos_doc_links")
@@ -51,5 +52,95 @@ rr <- select(tt, -Species)
 ee <- distinct(rr, pdf, .keep_all = TRUE)
 ee <- select(ee, -Doc_Link)
 
+# need to run this on next load so that we can filter by date
+ee$Date <- as.Date(ee$Date)
+
+# What the heck, why not try a test load to elasticsearch?
+connect()
+index_delete("esadocs2")
+docs_bulk(ee, index = "esadocs2")
+
+
+######################
+# some search testing
+
+body1 <- '{
+  "inline" : {
+    "query": { "match" : { "{{my_field}}" : "{{my_value}}" } },
+    "size" : "{{my_size}}",
+    "highlight" : { "fields" : { "{{my_field}}" : {"fragment_size" : 150, "number_of_fragments" : 3} } }
+  },
+  "params" : {
+    "my_field" : "raw_txt",
+    "my_value" : "flower",
+    "my_size" : 20
+  }
+}'
+rr <- Search_template(body = body1)$hits$hits
+
+body2 <- list(
+  inline = list(query = list(match = list(`{{my_field}}` = "{{my_value}}")),
+                size = "{{my_size}}",
+                highlight = list(
+                  fields = list(
+                    `{{my_field}}` = list(
+                      `fragment_size` = 150)
+                    )
+                  )
+                ),
+  params = list(my_field = "raw_txt",
+                my_value = "flowers",
+                my_size = 20L)
+)
+tt <- Search_template(body = body2)$hits$hits
+t2 <- result_asdf(tt)
+
+t2 <- Search(index = c("esadocs2", "esadocs"),
+             q = "'default_field': 'raw_txt', 'query' = 'Viola'",
+             size = 3,
+             body = paste('"highlight" : { "fields" : { "{{my_field}}" :',
+                    '{"fragment_size" : 150, "number_of_fragments" : 3} }}')
+             )$hits$hits
+t3 <- result_asdf(t2)
+
+tt <- Search_template_render(body = body2)
+
+test_fx <- function(res, x) {
+  res_ls = list()
+  for(i in x) {
+    spp_tmp <- paste(res[[i]]$`_source`$Scientific_Name, collapse = "; ")
+    rest <- res[[i]]$`_source`[1:12]
+    cur_dat <- data.frame(rest, species = spp_tmp)
+    res_ls[[i]] <- cur_dat
+  }
+  res_df <- dplyr::bind_rows(res_ls)
+  return(res_df)
+}
+
+test_hi <- function(res) {
+  abbrev <- function(x) {
+    if(length(x) > 3) {
+      paste(x[1:3], collapse = "...")
+    } else {
+      paste(x, collapse = "...")
+    }
+  }
+  res_ls = list()
+  for(i in 1:length(res)) {
+    hi_tmp <- lapply(res[[i]]$highlight, FUN = abbrev)
+    hi_tmp <- str_replace_all(hi_tmp,
+                              "[ ]{2,}|\n",
+                              " ")
+    res_ls[[i]] <- hi_tmp
+  }
+  res_df <- unlist(res_ls)
+  return(res_df)
+}
+
+y <- test_fx(tt, 1:3)
+
+o <- result_asdf(tt)
+hi1 <- test_hi(tt)
+hi2 <- get_highlight(tt)
 
 

@@ -9,8 +9,9 @@ sidebar <- dashboardSidebar(disable = TRUE)
 
 #############################################################################
 # Define the page(s) with dashboardBody
-body <- dashboardBody(
+body <- dashboardBody(fluidPage(
   div(class = "outer",
+    shinyjs::useShinyjs(),
     tags$head(
       HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400'
            rel='stylesheet' type='text/css'>"),
@@ -19,16 +20,17 @@ body <- dashboardBody(
           border-color: #808080 !important;
           height: 2px;
         }
+
         .box {
           box-shadow: 2px 2px 2px #d9d9d9;
         }
 
         div.outer {
+          background-color: white;
           top: 50px;
           left: 0;
           right: 0;
           bottom: 0;
-          overflow: hidden;
           padding: 0;
         }
 
@@ -38,6 +40,11 @@ body <- dashboardBody(
           font-weight: 300;
         }
         h1, h2, h3, h4 { font-weight: 400; }
+
+        .search-res {
+          background-color:white;
+          border-bottom: 1px solid #cccccc;
+        }
 
         ")
       )
@@ -56,8 +63,8 @@ body <- dashboardBody(
       column(10,
         fluidRow(
           column(2,
-            div(h3("ESAdocs", style = "font-weight:bold;padding-bottom:2px"),
-                span("Search", style = "font-size:125%;padding-top:5px"))
+            img(src = "ESAdocs_search.svg",
+                height = "80px")
           ),
           column(8,
             div(class = "input-group", style = "padding-top:20px",
@@ -88,13 +95,29 @@ body <- dashboardBody(
             uiOutput("hits")
           ),
           column(4,
-            helpText(textOutput("n_docs"))
+            fluidRow(
+              column(12,
+                helpText(textOutput("n_docs"))
+              )
+            ),
+            fluidRow(
+              column(12,
+                shinyjs::hidden(div(id = "selector",
+                  selectInput("summary_plot",
+                              label = NULL,
+                              choices = c("Score", "Date")
+                  ))
+                ),
+                plotOutput("score_dist", height="300px")
+              )
+            )
           )
         )
       ),
       column(1)
     )
   )
-)
+))
 
-dashboardPage(header, sidebar, body, skin="blue")
+# dashboardPage(header, sidebar, body, skin="blue")
+body

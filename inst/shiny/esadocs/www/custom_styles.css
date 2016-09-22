@@ -68,7 +68,7 @@ div.graph-outer {
 }
 
 /* Customize fonts */
-body, label, input, button, select { 
+body, label, input, button, select {
   font-family: 'Open Sans';
   /* font-family: 'Helvetica Neue', Helvetica; */
   font-weight: 300;
@@ -140,4 +140,10 @@ h1, h2, h3, h4 { font-weight: 400; }
 
 .leaflet-control-zoomhome a {
     font: bold 18px "Lucida Console",Monaco,monospace;
+}
+
+.search-res {
+  background-color:white;
+  padding: 5px 10px 5px 10px;
+  box-shadow: 3px 3px 2px gray;
 }
