@@ -55,10 +55,17 @@ shinyServer(function(input, output) {
     }
   })
 
+  test_nulls <- function(x) {
+    if(class(x) == "NULL" |
+       class(x) == "NA" |
+       class(x) == "logical") {
+      return(TRUE)
+    }
+    return(FALSE)
+  }
+
   output$n_hits <- renderText({
-    if(is.null(cur_res())) {
-      return("")
-    } else if(is.na(cur_res())) {
+    if(test_nulls(cur_res())) {
       return("")
     } else if(n_match() > 1) {
       return(paste(n_match(), "matches"))
@@ -68,11 +75,9 @@ shinyServer(function(input, output) {
   })
 
   output$hits <- renderUI({
-    if(is.null(cur_res())) {
+    if(test_nulls(cur_res())) {
       h4("No matches; please enter a search.")
-    } else if(is.na(cur_res())) {
-      h4("No matches; please try another search.")
-    } else if(!is.na(cur_res())) {
+    } else if(class(cur_res()) != "NA") {
       lapply(1:n_match(), function(i) {
         div(div(class = "search-res",
           fluidRow(
@@ -108,9 +113,8 @@ shinyServer(function(input, output) {
   })
 
   output$score_dist <- renderPlot({
+    if(test_nulls(cur_res())) return(NULL)
     if(input$summary_plot == "Score") {
-      if(is.null(cur_res())) return(NULL)
-      if(is.na(cur_res())) return(NULL)
       shinyjs::show("selector")
       dat <- data.frame(score = cur_res()$Score)
       if(dim(dat)[1] == 0) return(NULL)
@@ -125,8 +129,6 @@ shinyServer(function(input, output) {
              theme_hc()
       return(p)
     } else if(input$summary_plot == "Date") {
-      if(is.null(cur_res())) return(NULL)
-      if(is.na(cur_res())) return(NULL)
       shinyjs::show("selector")
       dat <- data.frame(date = as.Date(cur_res()$Date))
       if(dim(dat)[1] == 0) return(NULL)
