@@ -46,6 +46,15 @@ body <- dashboardBody(fluidPage(
           border-bottom: 1px solid #cccccc;
         }
 
+        .selectize-input {
+          font-size: small;
+          border-color: white;
+        }
+
+        .selectize-dropdown {
+          font-size: small;
+        }
+
         ")
       )
     ),
@@ -87,27 +96,53 @@ body <- dashboardBody(fluidPage(
             img(src = "DOW_logo_small.png")
           )
         ),
+        fluidRow(
+          column(2,
+            div(class = "slim",
+              selectInput("show_n",
+                          label = NULL,
+                          choices = c("Hits per page", 10, 20, 50),
+                          width = "75%",
+                          multiple = FALSE)
+            )
+          )
+        ),
 
-        # br(),
-        hr(),
+        hr(style = "padding-above:2px; margin:1px"),
 
         fluidRow(
           column(8,
             helpText(textOutput("n_hits")),
-            uiOutput("hits")
+            # uiOutput("hits")
+            hidden(uiOutput("hits"))
+            # hidden(
+            #   div(
+            #     class = "current_page",
+            #     id = paste0("step")
+            #   )
+            # )
           ),
           column(4,
             fluidRow(
               column(12,
                 shinyjs::hidden(div(id = "selector",
-                  selectInput("summary_plot",
-                              label = "Summarize by:",
-                              choices = c("Score", "Date")
+                  radioButtons("summary_plot",
+                               label = "Summarize by:",
+                               choices = c("Score", "Date"),
+                               inline = TRUE,
+                               width = "75%"
                   ))
                 ),
                 plotOutput("score_dist", height="300px")
               )
             )
+          )
+        ),
+        fluidRow(
+          column(12,
+            actionButton("prevButton", "< Previous"),
+            actionButton("nextButton", "Next >")
+            # uiOutput("page_links")
           )
         )
       ),
