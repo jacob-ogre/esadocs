@@ -55,6 +55,11 @@ body <- dashboardBody(fluidPage(
           font-size: small;
         }
 
+        img {
+          display: block;
+          margin: auto;
+        }
+
         ")
       )
     ),
@@ -113,14 +118,7 @@ body <- dashboardBody(fluidPage(
         fluidRow(
           column(8,
             helpText(textOutput("n_hits")),
-            # uiOutput("hits")
             hidden(uiOutput("hits"))
-            # hidden(
-            #   div(
-            #     class = "current_page",
-            #     id = paste0("step")
-            #   )
-            # )
           ),
           column(4,
             fluidRow(
@@ -139,11 +137,29 @@ body <- dashboardBody(fluidPage(
           )
         ),
         fluidRow(
-          column(12,
-            actionButton("prevButton", "< Previous"),
-            actionButton("nextButton", "Next >")
-            # uiOutput("page_links")
-          )
+          column(8,
+            div(style = "width:50%; margin:0 auto;",
+              div(style = "display: inline-block",
+                hidden(bsButton("prevButton",
+                         label = "< Previous",
+                         style = "default",
+                         size = "small"))
+              ),
+              hidden(div(id = "res_txt",
+                         "Results pages",
+                         style = "font-weight:bold; display:inline-block")),
+              div(style = "display: inline-block",
+                hidden(bsButton("nextButton",
+                         label = "Next >",
+                         style = "default",
+                         size = "small"))
+              )
+            )
+          ),
+          column(4)
+        ),
+        fluidRow(
+          br()
         )
       ),
       column(1)

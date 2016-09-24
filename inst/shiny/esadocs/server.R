@@ -8,13 +8,7 @@ shinyServer(function(input, output) {
     toggleState(id = "prevButton", condition = rv$current_page > 1)
     toggleState(id = "nextButton", condition = rv$current_page < n_pages())
     hide(selector = ".page")
-    # print(generate_hits(cur_res())[[rv$current_page]])
-    # print(rv$current_page)
     show("hits")
-    # show(sprintf("pg%s", rv$current_page))
-    # output$hits <- renderUI({
-    #   show(generate_hits(cur_res())[[rv$current_page]][[1]])
-    # })
   })
 
   navPage <- function(direction) {
@@ -66,7 +60,7 @@ shinyServer(function(input, output) {
                     ),
       params = list(my_field = "raw_txt",
                     my_value = cur_input(),
-                    my_size = 20L)
+                    my_size = 50L)
     )
     cur_mats <- Search_template(body = body)$hits$hits
     if(length(cur_mats) > 0) {
@@ -140,12 +134,16 @@ shinyServer(function(input, output) {
   }
 
   n_pages <- reactive({
-    n_hits <- length(cur_res()[,1])
-    n_pages <- n_hits %/% srch_len()
-    if(n_hits %% srch_len() != 0) {
-      n_pages <- n_pages + 1
+    if(!test_nulls(cur_res())) {
+      n_hits <- length(cur_res()[,1])
+      n_pages <- n_hits %/% srch_len()
+      if(n_hits %% srch_len() != 0) {
+        n_pages <- n_pages + 1
+      }
+      return(n_pages)
+    } else {
+      return(1)
     }
-    return(n_pages)
   })
 
   generate_hits <- function(dat) {
@@ -158,17 +156,16 @@ shinyServer(function(input, output) {
       page_ls[[1]] <- lapply(1:length(dat[, 1]), hit_page, data = dat, pg = 1)
     } else {
       for(j in pages[1:n_pages() - 1]) {
-          cur_st <- breaks[pages[j]]
-          cur_en <- breaks[pages[j + 1]] - 1
-          cur_set <- dat[cur_st:cur_en, ]
-          page_ls[[j]] <- lapply(1:length(cur_set[, 1]),
-                                 hit_page,
-                                 data = dat,
-                                 pg = j)
+        cur_st <- breaks[pages[j]]
+        cur_en <- breaks[pages[j + 1]] - 1
+        cur_set <- dat[cur_st:cur_en, ]
+        page_ls[[j]] <- lapply(1:length(cur_set[, 1]),
+                               hit_page,
+                               data = dat[cur_st:cur_en, ],
+                               pg = j)
       }
       cur_st <- breaks[length(breaks)]
       cur_en <- length(dat[,1])
-      observe({ print(c(cur_st, cur_en)) })
       page_ls[[length(pages)]] <- lapply(1:length(dat[cur_st:cur_en, 1]),
                                          hit_page,
                                          data = dat[cur_st:cur_en, ],
@@ -182,7 +179,12 @@ shinyServer(function(input, output) {
       h4("No matches; please enter another search.")
     } else {
       pages <- generate_hits(cur_res())
-      # observe({ print(pages[[rv$current_page]]) })
+      if(length(pages) > 1) {
+        show("prevButton")
+        show("res_txt")
+        show("nextButton")
+      }
+      # observe({ print(pages) })
       return(pages[[rv$current_page]])
     }
   })
