@@ -4,6 +4,7 @@ shinyServer(function(input, output, session) {
 
   rv <- reactiveValues(current_page = 1)
 
+  # observer for incrementing pages
   observe({
     toggleState(id = "prevButton", condition = rv$current_page > 1)
     toggleState(id = "nextButton", condition = rv$current_page < n_pages())
@@ -24,13 +25,15 @@ shinyServer(function(input, output, session) {
                toggle("extras",
                       anim = TRUE,
                       animType = "fade",
-                      time = 0.75))
+                      time = 0.25))
 
+  # the number of indexed documents; could change to an option() later
   output$n_docs <- renderText({
     tmp <- index_stats("esadocs2")$indices$esadocs2$total$docs$count
     return(paste(tmp, "documents indexed"))
   })
 
+  # set the number of results per page
   srch_len <- reactive({
     if(input$show_n == "Hits per page (10)") {
       return(10)
@@ -39,25 +42,28 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # placeholder function for cleaning input; will probably be extended
   replace_chars <- function(x) {
-    x <- stringr::str_replace_all(x,
-                                  pattern = "\\{|\\}|;",
-                                  replacement = " ")
+    x <- str_replace_all(x,
+                         pattern = "\\{|\\}|;",
+                         replacement = " ")
     return(x)
   }
 
+  # reactive form of input$main_input
   cur_input <- reactive({
     return(replace_chars(input$main_input))
   })
 
+  # convert input$date_filt into a Date
   date_filter <- reactive({
     lapply(input$date_filt, as.Date)
   })
 
-  #  | input$re_search
+  # MAIN SEARCH FUNCTION; note 50-result limit at this time, very simple search
+  # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)
-    srch <- cur_input()
     body <- list(
       inline = list(query = list(match = list(`{{my_field}}` = "{{my_value}}")),
                     size = "{{my_size}}",
@@ -77,10 +83,8 @@ shinyServer(function(input, output, session) {
     )
     cur_mats <- Search_template(body = body)$hits$hits
     if(length(cur_mats) > 0) {
-      # observe({ print(input$type_filt) })
       res_df <- result_asdf(cur_mats)
       res_df$highlight <- get_highlight(cur_mats)
-      # observe({ print(names(res_df)) })
       ######### REMOVE AFTER CORRECT LOADING!
       res_df$Date <- as.Date(res_df$Date)
       #########
@@ -110,6 +114,7 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # Test for NULL/NA/logical classes; used where these classes aren't expected
   test_nulls <- function(x) {
     if(class(x) == "NULL" |
        class(x) == "NA" |
@@ -129,39 +134,107 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # MAIN HTML GENERATION
   hit_page <- function(i, data, pg) {
     div(id = paste0("pg", pg),
       div(class = "search-res",
         fluidRow(
           column(10,
-            span(
-              ifelse(nchar(data$Title[i]) > 10,
-                           data$Title[i],
-                           "No document title"),
-              style = "font-size:larger;font-weight:bold"
+            a(href = data$link[i],
+              target = "_blank",
+              span(
+                ifelse(nchar(data$Title[i]) > 10 & !is.na(data$Title[i]),
+                       data$Title[i],
+                       "No document title"),
+                style = "font-size:larger;font-weight:bold"
+              )
             ),
             fluidRow(
               column(3,
-                div(class = "date-div",
-                    icon("calendar"),
-                    data$Date[i])),
+                div(class = "info-div",
+                    icon("file-text-o"),
+                    str_replace(data$type[i], "_", " "))
+              ),
               column(3,
-                div(class = "score-div",
+                div(class = "info-div",
+                    icon("calendar"),
+                    data$Date[i])
+              ),
+              column(3,
+                div(class = "info-div",
                     icon("star"),
-                    paste("Score:", round(data$Score[i], 3))))
+                    paste("Score:", round(data$Score[i], 3)))
+              ),
+              column(3)
             ),
-            HTML(data$highlight[i]),
-            br()
-          ),
-          column(2,
-            div(a(href = data$link[i],
-                  target = "_blank",
-                  style = "color:#cc0000",
-                  icon("file-pdf-o", "fa-2x"),
-                  "PDF")
+            fluidRow(
+              column(12,
+                HTML(data$highlight[i])
+              )
+            ),
+            fluidRow(
+              column(2,
+                popify(
+                  actionLink(
+                    inputId = paste0("spp", i),
+                    label = div(style = "font-weight:300;",
+                                "Species"),
+                    style = "default"
+                  ),
+                  title = "Relevant species",
+                  content = HTML(data$Species[i]),
+                  placement = "right",
+                  trigger = "focus"
+                )
+              ),
+              column(2,
+                popify(
+                  actionLink(
+                    inputId = paste0("state", i),
+                    label = div(style = "font-weight:300;",
+                                "States"),
+                    style = "default"
+                  ),
+                  title = "Relevant U.S. states",
+                  content = paste(
+                    "Not yet calculated. Future iterations will calculate the",
+                    "states relevant to the document based on the occurrence",
+                    "of species referenced in the document."),
+                  placement = "right",
+                  trigger = "focus"
+                )
+              )
             )
+          ),
+          column(2 #,
+            # div(
+            #   a(href = data$link[i],
+            #     target = "_blank",
+            #     style = "color:#cc0000",
+            #     icon("file-pdf-o", "fa-2x"),
+            #     "PDF"
+            #   )
+            # ),
+            # br(),
+            # popify(
+            #   div(
+            #     actionLink(
+            #       inputId = paste0("rawtxt", i),
+            #       label = NULL,
+            #       icon = icon("file-text-o", "fa-2x"),
+            #       "TXT"
+            #     )
+            #   ),
+            #   title = "Raw text",
+            #   content = paste(
+            #     str_sub(data$raw_txt[i], 1, 750),
+            #     "....."),
+            #   placement = "right",
+            #   trigger = "focus"
+            # )
           )
-        )),
+        )
+        ),
         div(style = "background:rgba(0,0,0,0)",
           br()
         )
@@ -224,37 +297,67 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  output$score_dist <- renderPlot({
+  output$summary_figs <- renderUI({
     if(test_nulls(cur_res())) return(NULL)
-    if(input$summary_plot == "Score") {
-      shinyjs::show("selector")
+    show("summ_head")
+    output$score_plot <- renderPlot({
       dat <- data.frame(score = cur_res()$Score)
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
       p <- ggplot(data = dat, aes(score)) +
              geom_histogram(bins = nbin) +
-             labs(x = "Score",
-                  y = "# documents",
-                  title = "Score distribution",
-                  subtitle = "higher = better") +
+             labs(x = "Search score",
+                  y = "# documents") +
              theme_hc()
       return(p)
-    } else if(input$summary_plot == "Date") {
-      shinyjs::show("selector")
+    })
+
+    output$date_plot <- renderPlot({
       dat <- data.frame(date = as.Date(cur_res()$Date))
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
       p <- ggplot(data = dat, aes(date)) +
              geom_histogram(bins = nbin) +
-             labs(x = "Date",
-                  y = "# documents",
-                  title = "Date distribution",
-                  subtitle = "higher = better") +
+             labs(x = "Document date",
+                  y = "# documents") +
              theme_hc()
       return(p)
-    }
+    })
+
+    output$top_spp <- renderPlot({
+    spp_list <- str_split(
+      paste(cur_res()$Species, collapse = "<br>"),
+      "<br>")
+    spp_tab <- sort(table(spp_list), decreasing = TRUE)[1:10]
+    spp_df <- data.frame(species = names(spp_tab),
+                         count = as.vector(spp_tab),
+                         stringsAsFactors = FALSE)
+    p <- ggplot(spp_df, aes(x = species, y = count)) +
+      geom_bar(stat = "identity") +
+      coord_flip() +
+      labs(x = "", subtitle = "Top 10 species") +
+      theme_hc()
+    return(p)
+    })
+
+    tabBox(
+      tabPanel(
+        title = "Score",
+        plotOutput("score_plot", height = "250px")
+      ),
+      tabPanel(
+        title = "Date",
+        plotOutput("date_plot", height = "250px")
+      ),
+      tabPanel(
+        title = "Species",
+        plotOutput("top_spp", height = "250px")
+      ),
+      width = 12,
+      height = "200px"
+    )
   })
 
 })

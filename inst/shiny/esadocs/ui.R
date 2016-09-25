@@ -43,7 +43,7 @@ body <- dashboardBody(fluidPage(
 
         .search-res {
           background-color:white;
-          border-bottom: 1px solid #cccccc;
+          border-bottom: 1px solid #f2f2f2;
           padding-bottom: 5px;
         }
 
@@ -61,6 +61,17 @@ body <- dashboardBody(fluidPage(
           border-color: white;
         }
 
+        .btn-default, .sbs-toggle-button, .action-button {
+          border-radius: 1px;
+          font-weight: bold;
+        }
+
+        .btn-default, .action-button:hover {
+          border-radius: 1px;
+          border-color: white;
+        }
+
+        /* DATE RANGE SELECTOR */
         .input-sm {
           background-color: #f2f2f2;
           border-color: white;
@@ -71,6 +82,7 @@ body <- dashboardBody(fluidPage(
           background-color: #404040;
           color: white;
         }
+        /* DATE RANGE SELECTOR */
 
         .dropdown-toggle {
           border-color: white;
@@ -88,19 +100,32 @@ body <- dashboardBody(fluidPage(
           margin: auto;
         }
 
-        .date-div {
-          color: #D69336;
-          font-weight: bold;
-          padding-top: 5px;
-          padding-bottom: 5px;
+        .info-div {
+          color: #009933;
+          padding-top: 3px;
+          padding-bottom: 3px;
         }
 
-        .score-div {
-          color: #533F7A;
-          font-weight: bold;
-          padding-top: 5px;
-          padding-bottom: 5px;
+        .popover {
+          border-radius: 1px;
+          width: 350px;
+          max-width: 350px;
         }
+
+        .popover-title {
+          font-size: 110%;
+          font-weight: bold;
+        }
+
+        .popover-content {
+          font-size: 90%;
+          font-weight: light;
+        }
+
+        .nav-tabs>li>a, .nav-tabs>li.active {
+          border-radius: 1px;
+        }
+
 
         ")
       )
@@ -150,7 +175,7 @@ body <- dashboardBody(fluidPage(
               inputId = "tog_extras",
               label = NULL,
               icon = icon("filter"),
-              size = "small",
+              size = "large",
               type = "toggle",
               value = FALSE
             )
@@ -179,7 +204,7 @@ body <- dashboardBody(fluidPage(
                 "type_filt",
                 label = NULL,
                 choices = list(
-                  "Doc. type" = "all",
+                  "Document type" = "all",
                   "Recovery plan" = "recovery_plan",
                   "Federal Register" = "federal_register",
                   "5-year review" = "five_year_review",
@@ -208,15 +233,8 @@ body <- dashboardBody(fluidPage(
           column(4,
             fluidRow(
               column(12,
-                shinyjs::hidden(div(id = "selector",
-                  radioButtons("summary_plot",
-                               label = "Summarize by:",
-                               choices = c("Score", "Date"),
-                               inline = TRUE,
-                               width = "75%"
-                  ))
-                ),
-                plotOutput("score_dist", height="300px")
+                hidden(h4(id = "summ_head", "Summary plots")),
+                uiOutput("summary_figs", height = "200px")
               )
             )
           )

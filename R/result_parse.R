@@ -20,7 +20,7 @@ result_asdf <- function(res) {
   res_ls <- list()
   for(i in 1:length(res)) {     # NOTE: lapply doesn't work in this case
     score_ls[[i]] <- res[[i]]$`_score`
-    spp_tmp <- paste(res[[i]]$`_source`$Scientific_Name, collapse = "; ")
+    spp_tmp <- paste(res[[i]]$`_source`$Scientific_Name, collapse = "<br>")
     n_vars <- length(res[[i]]$`_source`)
     rest <- res[[i]]$`_source`[1:n_vars-1]
     cur_dat <- data.frame(rest, Species = spp_tmp, stringsAsFactors = FALSE)
