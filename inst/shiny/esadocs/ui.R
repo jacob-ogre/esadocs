@@ -44,20 +44,62 @@ body <- dashboardBody(fluidPage(
         .search-res {
           background-color:white;
           border-bottom: 1px solid #cccccc;
+          padding-bottom: 5px;
         }
 
         .selectize-input {
-          font-size: small;
           border-color: white;
+          font-size: small;
+          margin-bottom: -10px;
         }
 
         .selectize-dropdown {
           font-size: small;
         }
 
+        .btn-default, .sbs-toggle-button, .btn-xs {
+          border-color: white;
+        }
+
+        .input-sm {
+          background-color: #f2f2f2;
+          border-color: white;
+          color: #404040;
+        }
+
+        .input-group-addon {
+          background-color: #404040;
+          color: white;
+        }
+
+        .dropdown-toggle {
+          border-color: white;
+          font-size: small;
+        }
+
+        .dropdown-menu {
+          font-size: small;
+          padding-left: 10px;
+          border-radius: 1px;
+        }
+
         img {
           display: block;
           margin: auto;
+        }
+
+        .date-div {
+          color: #D69336;
+          font-weight: bold;
+          padding-top: 5px;
+          padding-bottom: 5px;
+        }
+
+        .score-div {
+          color: #533F7A;
+          font-weight: bold;
+          padding-top: 5px;
+          padding-bottom: 5px;
         }
 
         ")
@@ -73,14 +115,14 @@ body <- dashboardBody(fluidPage(
 
     br(),
     fluidRow(
-      column(1),
+      column(1,
+        img(src = "ESAdocs_search.svg",
+            height = "80px")
+      ),
       column(10,
         fluidRow(
-          column(2,
-            img(src = "ESAdocs_search.svg",
-                height = "80px")
-          ),
-          column(8,
+          column(1),
+          column(9,
             div(class = "input-group", style = "padding-top:20px",
                 textInput(inputId = "main_input",
                           label = NULL,
@@ -98,18 +140,61 @@ body <- dashboardBody(fluidPage(
             helpText(textOutput("n_docs"), style="font-size:smaller")
           ),
           column(2,
-            img(src = "DOW_logo_small.png")
+            div(style = "position: absolute; right:0px",
+                img(src = "DOW_logo_small.png"))
           )
         ),
         fluidRow(
-          column(2,
-            div(class = "slim",
-              selectInput("show_n",
-                          label = NULL,
-                          choices = c("Hits per page", 10, 20, 50),
-                          width = "75%",
-                          multiple = FALSE)
+          column(1,
+            bsButton(
+              inputId = "tog_extras",
+              label = NULL,
+              icon = icon("filter"),
+              size = "small",
+              type = "toggle",
+              value = FALSE
             )
+          ),
+          div(id = "extras",
+            column(2,
+              div(class = "slim",
+                selectInput("show_n",
+                            label = NULL,
+                            choices = c("Hits per page (10)", 20, 50, 100),
+                            width = "95%",
+                            multiple = FALSE)
+              )
+            ),
+            column(3,
+              dateRangeInput(
+                "date_filt",
+                label = NULL,
+                start = as.Date("1967-01-01"),
+                end = Sys.Date(),
+                width = "95%"
+              )
+            ),
+            column(2,
+              selectInput(
+                "type_filt",
+                label = NULL,
+                choices = list(
+                  "Doc. type" = "all",
+                  "Recovery plan" = "recovery_plan",
+                  "Federal Register" = "federal_register",
+                  "5-year review" = "five_year_review",
+                  "7(a)(1)" = "section_7a1",
+                  "Consultation" = "section_7a2",
+                  "HCP" = "HCP",
+                  "SHA" = "SHA",
+                  "CCA" = "CCA",
+                  "CCAA" = "CCAA",
+                  "Section 10(a)(1)(A)" = "section_10a1A"
+                ),
+                width = "95%"
+              )
+            ),
+            column(4)
           )
         ),
 

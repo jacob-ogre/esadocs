@@ -1,6 +1,6 @@
 # BSD_2_clause
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
 
   rv <- reactiveValues(current_page = 1)
 
@@ -8,7 +8,10 @@ shinyServer(function(input, output) {
     toggleState(id = "prevButton", condition = rv$current_page > 1)
     toggleState(id = "nextButton", condition = rv$current_page < n_pages())
     hide(selector = ".page")
-    show("hits")
+    show("hits",
+         anim = TRUE,
+         animType = "fade",
+         time = 0.25)
   })
 
   navPage <- function(direction) {
@@ -17,6 +20,11 @@ shinyServer(function(input, output) {
 
   observeEvent(input$prevButton, navPage(-1))
   observeEvent(input$nextButton, navPage(1))
+  observeEvent(input$tog_extras,
+               toggle("extras",
+                      anim = TRUE,
+                      animType = "fade",
+                      time = 0.75))
 
   output$n_docs <- renderText({
     tmp <- index_stats("esadocs2")$indices$esadocs2$total$docs$count
@@ -24,7 +32,7 @@ shinyServer(function(input, output) {
   })
 
   srch_len <- reactive({
-    if(input$show_n == "Hits per page") {
+    if(input$show_n == "Hits per page (10)") {
       return(10)
     } else {
       return(as.numeric(input$show_n))
@@ -42,6 +50,11 @@ shinyServer(function(input, output) {
     return(replace_chars(input$main_input))
   })
 
+  date_filter <- reactive({
+    lapply(input$date_filt, as.Date)
+  })
+
+  #  | input$re_search
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)
     srch <- cur_input()
@@ -64,9 +77,25 @@ shinyServer(function(input, output) {
     )
     cur_mats <- Search_template(body = body)$hits$hits
     if(length(cur_mats) > 0) {
+      # observe({ print(input$type_filt) })
       res_df <- result_asdf(cur_mats)
       res_df$highlight <- get_highlight(cur_mats)
-      return(res_df)
+      # observe({ print(names(res_df)) })
+      ######### REMOVE AFTER CORRECT LOADING!
+      res_df$Date <- as.Date(res_df$Date)
+      #########
+      res_df <- filter(res_df,
+                       is.na(res_df$Date) |
+                       (res_df$Date >= date_filter()[1] &
+                        res_df$Date <= date_filter()[2]))
+      if(input$type_filt != "all") {
+        res_df <- filter(res_df, res_df$type == input$type_filt)
+      }
+      if(length(res_df[,1]) > 0) {
+        return(res_df)
+      } else {
+        return(NA)
+      }
     } else {
       return(NA)
     }
@@ -111,19 +140,25 @@ shinyServer(function(input, output) {
                            "No document title"),
               style = "font-size:larger;font-weight:bold"
             ),
-            div(
-              a(href = data$link[i],
-                ifelse(nchar(data$link[i]) < 40,
-                       data$link[i],
-                       str_trunc(data$link[i], 40))),
-              p(HTML(data$highlight[i])),
-              helpText(paste("Score:", data$Score[i])))
+            fluidRow(
+              column(3,
+                div(class = "date-div",
+                    icon("calendar"),
+                    data$Date[i])),
+              column(3,
+                div(class = "score-div",
+                    icon("star"),
+                    paste("Score:", round(data$Score[i], 3))))
+            ),
+            HTML(data$highlight[i]),
+            br()
           ),
           column(2,
             div(a(href = data$link[i],
                   target = "_blank",
                   style = "color:#cc0000",
-                  icon("file-pdf-o", "fa-2x"))
+                  icon("file-pdf-o", "fa-2x"),
+                  "PDF")
             )
           )
         )),
