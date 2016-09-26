@@ -27,6 +27,8 @@ shinyServer(function(input, output, session) {
                       animType = "fade",
                       time = 0.25))
 
+  # observe({ })
+
   # the number of indexed documents; could change to an option() later
   output$n_docs <- renderText({
     tmp <- index_stats("esadocs2")$indices$esadocs2$total$docs$count
@@ -298,8 +300,14 @@ shinyServer(function(input, output, session) {
   })
 
   output$summary_figs <- renderUI({
-    if(test_nulls(cur_res())) return(NULL)
-    show("summ_head")
+    if(test_nulls(cur_res())) {
+      toggle("prevButton")
+      toggle("res_txt")
+      toggle("nextButton")
+      toggle("summ_head")
+      return(NULL)
+    }
+    toggle("summ_head")
     output$score_plot <- renderPlot({
       dat <- data.frame(score = cur_res()$Score)
       if(dim(dat)[1] == 0) return(NULL)
@@ -337,7 +345,9 @@ shinyServer(function(input, output, session) {
     p <- ggplot(spp_df, aes(x = species, y = count)) +
       geom_bar(stat = "identity") +
       coord_flip() +
-      labs(x = "", subtitle = "Top 10 species") +
+      labs(x = "",
+           y = "# documents",
+           subtitle = "Top 10 species") +
       theme_hc()
     return(p)
     })

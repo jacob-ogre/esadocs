@@ -241,7 +241,9 @@ body <- dashboardBody(fluidPage(
         ),
         fluidRow(
           column(8,
-            div(style = "width:50%; margin:0 auto;",
+            div(
+              id = "nextprev",
+              style = "width:50%; margin:0 auto;",
               div(style = "display: inline-block",
                 hidden(bsButton("prevButton",
                          label = "< Previous",
