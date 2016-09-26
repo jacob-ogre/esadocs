@@ -21,7 +21,7 @@ names(test) <- c("Species", "Doc_Link", "link", "text", "type")
 names(federal_register_table)
 
 # First need to test that the loading will work as I think it will work
-tmp <- head(fedreg, 25)
+tmp <- head(fedreg, 50)
 names(tmp) <- c("Species", "Doc_Link", "link", "text", "type")
 
 ##########
