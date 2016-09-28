@@ -31,3 +31,23 @@ load_doc_text <- function(path) {
   if(!file.exists(path)) return(NA)
   return(paste(readLines(path), collapse = " "))
 }
+
+
+#' Test for NULL/NA/logical classes where these classes aren't expected
+#'
+#' @param x The object to be tested
+#' @return Logical; TRUE if NULL/NA/logical, else FALSE
+#' @export
+#' @examples
+#' \dontrun{
+#' tesf <- ("path/to/file.txt")
+#' }
+test_nulls <- function(x) {
+  if(class(x) == "NULL" |
+     class(x) == "NA" |
+     class(x) == "logical") {
+    return(TRUE)
+  }
+  return(FALSE)
+}
+

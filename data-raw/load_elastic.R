@@ -49,34 +49,199 @@ qq$pdf_size <- file.size(normalizePath(qq$pdf_path))
 spp <- aggregate(Scientific_Name ~ href, data = fedreg, FUN = unique)
 tt <- left_join(qq, spp, by = c("Doc_Link" = "href"))
 rr <- select(tt, -Species)
-ee <- distinct(rr, pdf, .keep_all = TRUE)
+ee <- distinct(rr, pdf, Title, .keep_all = TRUE)
 ee <- select(ee, -Doc_Link)
 
 # need to run this on next load so that we can filter by date
 ee$Date <- as.Date(ee$Date)
 
+## NGram tokenizer
+body <- '{
+  "settings" : {
+    "analysis" : {
+      "analyzer" : {
+        "my_ngram_analyzer" : {
+          "type": "custom",
+          "tokenizer" : "standard",
+          "filter": [
+            "standard",
+            "lowercase",
+            "stop",
+            "custom_shingle"
+          ]
+        }
+      },
+      "filter" : {
+        "custom_shingle": {
+          "type": "shingle",
+          "min_shingle_size": "2",
+          "max_shingle_size": "3"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "federal_register": {
+      "properties": {
+        "link": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "Date": {
+          "type": "date",
+          "index": "not_analyzed"
+        },
+        "Date": {
+          "type": "date",
+          "index": "not_analyzed"
+        },
+        "Citation Page": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "Title": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "pdf": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "txt": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "pdf_path": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "txt_path": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "raw_txt": {
+          "type": "string",
+          "index": "analyzed",
+          "analyzer": "my_ngram_analyzer"
+        },
+        "pdf_md5": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "pdf_size": {
+          "type": "long",
+          "index": "not_analyzed"
+        },
+        "Species": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  }
+}'
+
 # What the heck, why not try a test load to elasticsearch?
 connect()
 index_delete("esadocs2")
-docs_bulk(ee, index = "esadocs2")
+index_create("esadocs2", body = body)
+bulk <- docs_bulk(ee, index = "esadocs2", type = "federal_register")
 
+index_analyze(text = "\"Fish and Wildlife Service\"",
+              index = "esadocs2",
+              analyzer = "my_ngram_analyzer")
+
+ll <- Search(index = "esadocs2",
+             q = "Fish and Wildlife",
+             analyzer = "my_ngram_analyzer",
+             size = 25)
+ll <- Search(index = "esadocs2",
+             q = "flower^5",
+             analyzer = "my_ngram_analyzer",
+             size = 25)
+pl <- result_asdf(ll$hits$hits)
 
 ######################
 # some search testing
 
 body1 <- '{
   "inline" : {
-    "query": { "match" : { "{{my_field}}" : "{{my_value}}" } },
+    "query": {
+      "simple_query_string": {
+        "query": "{{my_value}}",
+        "analyzer": "my_ngram_analyzer",
+        "fields": [ "{{my_field}}" ],
+        "default_operator": "and"
+      }
+    },
     "size" : "{{my_size}}",
-    "highlight" : { "fields" : { "{{my_field}}" : {"fragment_size" : 150, "number_of_fragments" : 3} } }
+    "highlight": {
+      "fields": {
+        "{{my_field}}" : {
+          "fragment_size" : 150,
+          "number_of_fragments" : 3
+        }
+      }
+    }
   },
   "params" : {
     "my_field" : "raw_txt",
-    "my_value" : "flower",
+    "my_value" : "\\"fish and wildlife\\"",
     "my_size" : 20
   }
 }'
+
+body1 <- list(
+  inline = list(
+    query = list(
+      simple_query_string = list(
+        query = "{{my_value}}",
+        analyzer = "my_ngram_analyzer",
+        fields = list( "{{my_field}}" ),
+        default_operator = "and"
+      )
+    ),
+    size = "{{my_size}}",
+    highlight = list(
+      fields = list(
+        `{{my_field}}` = list(
+          fragment_size = 150,
+          number_of_fragments = 3
+        )
+      )
+    )
+  ),
+  params = list(
+    my_field = "raw_txt",
+    my_value = "fish and wildlife",
+    my_size = 20
+  )
+)
+
+Search_template_render(body = body1)
 rr <- Search_template(body = body1)$hits$hits
+
+length(rr)
+dim(result_asdf(rr))
+ghh <- result_asdf(rr)
+ghh$highlight <- get_highlight(rr)
+
+vv <- termvectors("esadocs2",
+                  type = "federal_register",
+                  id = "AVdr8968E9ijamFrGyQc",
+                  fields = list("raw_txt"),
+                  term_statistics = TRUE,
+                  field_statistics = FALSE,
+                  payloads = FALSE,
+                  positions = FALSE)
+terms <- names(vv$term_vectors$raw_txt$terms)
+terms[1:1000]
+
+############
 
 body2 <- list(
   inline = list(query = list(match = list(`{{my_field}}` = "{{my_value}}")),

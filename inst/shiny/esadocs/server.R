@@ -27,8 +27,6 @@ shinyServer(function(input, output, session) {
                       animType = "fade",
                       time = 0.25))
 
-  # observe({ })
-
   # the number of indexed documents; could change to an option() later
   output$n_docs <- renderText({
     tmp <- index_stats("esadocs2")$indices$esadocs2$total$docs$count
@@ -66,6 +64,18 @@ shinyServer(function(input, output, session) {
   # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)
+
+    # # first determine if type, species, date in query
+    # if(type_present(cur_input())) {
+    #   add_type_filter(get_type(cur_input()))
+    # }
+    # if(species_present(cur_input())) {
+    #   add_species_filter(get_type(cur_input()))
+    # }
+    # if(date_present(cur_input())) {
+    #   add_date_filter(get_dates(cur_input()))
+    # }
+
     body <- list(
       inline = list(query = list(match = list(`{{my_field}}` = "{{my_value}}")),
                     size = "{{my_size}}",
@@ -115,16 +125,6 @@ shinyServer(function(input, output, session) {
       return(0)
     }
   })
-
-  # Test for NULL/NA/logical classes; used where these classes aren't expected
-  test_nulls <- function(x) {
-    if(class(x) == "NULL" |
-       class(x) == "NA" |
-       class(x) == "logical") {
-      return(TRUE)
-    }
-    return(FALSE)
-  }
 
   output$n_hits <- renderText({
     if(test_nulls(cur_res())) {
