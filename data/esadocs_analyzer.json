@@ -1,0 +1,23 @@
+{
+  "analysis" : {
+    "analyzer" : {
+      "esadocs_analyzer" : {
+        "type": "custom",
+        "tokenizer" : "standard",
+        "filter": [
+          "standard",
+          "lowercase",
+          "stop",
+          "custom_shingle"
+        ]
+      }
+    },
+    "filter" : {
+      "custom_shingle": {
+        "type": "shingle",
+        "min_shingle_size": "2",
+        "max_shingle_size": "3"
+      }
+    }
+  }
+}

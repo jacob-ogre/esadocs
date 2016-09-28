@@ -10,11 +10,7 @@
 #' @export
 #' @examples
 #' fed_reg_mapping()
-fed_reg_mapping <- function(...) {
-  extras <- ...
-  if(length(extras) > 0) {
-    message("Adding extra properties not yet enabled")
-  }
+fed_reg_mapping <- function() {
   fed_reg_map <- list(
     federal_register = list(
       properties = list(
@@ -30,7 +26,7 @@ fed_reg_mapping <- function(...) {
           type = "date",
           index = "not_analyzed"
         ),
-        Citation Page = list(
+        `Citation Page` = list(
           type = "string",
           index = "not_analyzed"
         ),
@@ -77,6 +73,11 @@ fed_reg_mapping <- function(...) {
   return(fed_reg_map)
 }
 
+#' @export
+alt_fed_reg_mapping <- function() {
+  paste(readLines("data/federal_register_mapping.json"), collapse = "\n")
+}
+
 #' Elasticsearch document mapping for ESA recovery plans
 #'
 #' Custom mapping of recovery plan variables in ESAdocs search. Most
@@ -87,11 +88,7 @@ fed_reg_mapping <- function(...) {
 #' @export
 #' @examples
 #' rec_plan_mapping()
-rec_plan_mapping <- function(...) {
-  extras <- ...
-  if(length(extras) > 0) {
-    message("Adding extra properties not yet enabled")
-  }
+rec_plan_mapping <- function() {
   rec_plan_map <- list(
     recovery_plan = list(
       properties = list(
@@ -160,11 +157,7 @@ rec_plan_mapping <- function(...) {
 #' @export
 #' @examples
 #' fiveyr_mapping()
-fiveyr_mapping <- function(...) {
-  extras <- ...
-  if(length(extras) > 0) {
-    message("Adding extra properties not yet enabled")
-  }
+fiveyr_mapping <- function() {
   fiveyr_map <- list(
     five_year_review = list(
       properties = list(
@@ -233,11 +226,7 @@ fiveyr_mapping <- function(...) {
 #' @export
 #' @examples
 #' consult_mapping()
-consult_mapping <- function(...) {
-  extras <- ...
-  if(length(extras) > 0) {
-    message("Adding extra properties not yet enabled")
-  }
+consult_mapping <- function() {
   consult_map <- list(
     s7_consultation = list(
       properties = list(

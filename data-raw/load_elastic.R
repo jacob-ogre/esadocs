@@ -145,19 +145,28 @@ body <- '{
   }
 }'
 
+body1 <- make_es_settings(
+  analyzers = list(esadocs_analyzer()),
+  mappings = list(fed_reg_mapping())
+)
+
+hj <- alt_make_es_settings(analyzers = list(alt_esadocs_analyzer()),
+                           mappings = list(alt_fed_reg_mapping()))
+po <- jsonlite::fromJSON(hj)
+
+
 # What the heck, why not try a test load to elasticsearch?
 connect()
 index_delete("esadocs2")
-index_create("esadocs2", body = body)
+index_create("esadocs2", body = hj)
 bulk <- docs_bulk(ee, index = "esadocs2", type = "federal_register")
 
-index_analyze(text = "\"Fish and Wildlife Service\"",
-              index = "esadocs2",
-              analyzer = "my_ngram_analyzer")
+index_analyze(text = "Fish and Wildlife Service",
+              index = "esadocs2")
 
 ll <- Search(index = "esadocs2",
              q = "Fish and Wildlife",
-             analyzer = "my_ngram_analyzer",
+             analyzer = "esadocs_analyzer",
              size = 25)
 ll <- Search(index = "esadocs2",
              q = "flower^5",

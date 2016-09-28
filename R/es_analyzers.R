@@ -1,6 +1,6 @@
 # BSD_2_clause
 
-#' Custom elasticsearch analyzer for ESAdocs 
+#' Custom elasticsearch analyzer for ESAdocs
 #'
 #' Building custom analyzers for elasticsearch is a bit of a pain: they either
 #' need to be text JSON or nested lists. This will, hopefully, make it a little
@@ -43,5 +43,21 @@ esadocs_analyzer <- function(tokenizer = "standard",
       )
     )
   )
+  return(new_analyzer)
+}
+
+#' Alt custom elasticsearch analyzer for ESAdocs
+#'
+#' Building custom analyzers for elasticsearch is a bit of a pain: they either
+#' need to be text JSON or nested lists. This will, hopefully, make it a little
+#' easier to tweak a basic custom analyzer. This is a string JSON representation
+#' of \link{esadocs_analyzer}
+#'
+#' @return A custom elasticsearch analyzer as a string JSON
+#' @export
+#' @examples
+#' alt_esadocs_analyzer()
+alt_esadocs_analyzer <- function() {
+  new_analyzer <- ''
   return(new_analyzer)
 }

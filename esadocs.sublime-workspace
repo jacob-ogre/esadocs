@@ -1,0 +1,315 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"paddin",
+				"padding-left"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 288.0,
+		"last_filter": "insta",
+		"selected_items":
+		[
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"R",
+				"Set Syntax: R Console"
+			],
+			[
+				"colo",
+				"Color Picker"
+			],
+			[
+				"wra",
+				"Word Wrap: Toggle"
+			],
+			[
+				"wrap",
+				"Word Wrap: Toggle"
+			],
+			[
+				"wr",
+				"Word Wrap: Toggle"
+			],
+			[
+				"brow",
+				"SFTP: Browse Server…"
+			],
+			[
+				"bros",
+				"SFTP: Browse Server…"
+			],
+			[
+				"edit",
+				"SFTP: Edit Server…"
+			],
+			[
+				"edi",
+				"SFTP: Edit Server…"
+			],
+			[
+				"enabl",
+				"Package Control: Enable Package"
+			],
+			[
+				"disab",
+				"Package Control: Disable Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 539.0
+	},
+	"console":
+	{
+		"height": 533.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/jacobmalcom/Downloads/seasprcp_201607/lead14_Aug_prcp.shp.xml",
+		"/Users/jacobmalcom/Downloads/fr42.txt",
+		"/Users/jacobmalcom/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/777E376F-3876-4BFE-9996-E57F985656A0/Background-And-Methods-For-Development-Site.txt",
+		"/Users/jacobmalcom/Repos/Defenders/defend-esc-dev/index.html",
+		"/Users/jacobmalcom/Repos/Defenders/analyses/hcphb/vignettes/cur_topic19_chunks.txt",
+		"/Users/jacobmalcom/Repos/Defenders/analyses/ch.first.pass/vignettes/CH_changes_overview_2.Rmd",
+		"/Users/jacobmalcom/Downloads/csa_27617.xml",
+		"/Users/jacobmalcom/test_json.json",
+		"/Users/jacobmalcom/Library/Application Support/CloudPull/drivefilelistjson/jacob dot w dot malcom at gmail dot com/1473431430/list479.json",
+		"/Users/jacobmalcom/Downloads/fr103.txt",
+		"/Users/jacobmalcom/Downloads/fr3894.txt",
+		"/Users/jacobmalcom/Google Drive/FWS/2007/Inequality/Routputiequality.txt",
+		"/Users/jacobmalcom/Google Drive/FWS/2007/Inequality/inequality.txt",
+		"/Users/jacobmalcom/Repos/Defenders/analyses/hcphb/data-raw/misc_testing_code.R",
+		"/Users/jacobmalcom/Repos/Defenders/analyses/recovery_actions_analysis/data/USESA_national_glossary.txt",
+		"/Users/jacobmalcom/Downloads/ECOS_TESS_report_links.txt",
+		"/Users/jacobmalcom/Repos/Defenders/analyses/ESA_NLP/Python/simulate_bad_scans.py",
+		"/Users/jacobmalcom/Repos/Defenders/tools/usagencies/data-raw/usagencies.txt",
+		"/Users/jacobmalcom/Downloads/check_embed_type.R",
+		"/Users/jacobmalcom/Repos/MaloneLab/Python/projects/Pyxi_assm/synteny/bulk_circos.py",
+		"/Users/jacobmalcom/Downloads/grep_for_section.R",
+		"/Users/jacobmalcom/Downloads/natgaplandcov_v2_2_metadata.xml",
+		"/Users/jacobmalcom/Downloads/gaplandcov_az/gaplndcov_AZ.img.aux.xml",
+		"/Users/jacobmalcom/Downloads/gaplandcov_az/gaplndcov_AZ.img.xml",
+		"/Users/jacobmalcom/Downloads/circos-0.69-3/example/etc/circos.conf",
+		"/Users/jacobmalcom/Downloads/circos-0.69-3/README",
+		"/Users/jacobmalcom/Downloads/scrape_ecos_D02F.js",
+		"/Users/jacobmalcom/Downloads/tmp_foreach_scrape.R",
+		"/Users/jacobmalcom/test_ff.txt",
+		"/Users/jacobmalcom/Repos/Defenders/tools/ocrerrors/R/ocr.R",
+		"/Users/jacobmalcom/test_coll.txt",
+		"/Users/jacobmalcom/test_pdf_text.txt",
+		"/private/var/folders/fy/wcg7t12j32d0tztj7sls01g00000gn/T/Rtmp0Ni7Xw/TXTs/doc732.txt",
+		"/private/var/folders/fy/wcg7t12j32d0tztj7sls01g00000gn/T/Rtmp14QBqh/test.txt",
+		"/Users/jacobmalcom/Repos/Defenders/tools/ocrerrors/GOLDs/doc732.txt",
+		"/Users/jacobmalcom/Repos/Defenders/tools/ocrerrors/GOLDs/doc732_fax_gold.txt",
+		"/Users/jacobmalcom/Repos/Defenders/tools/ocrerrors/BADs/doc732_fax.txt",
+		"/Users/jacobmalcom/Repos/Defenders/tools/ocrerrors/BADs/doc732_fax_2.txt.txt",
+		"/Users/jacobmalcom/Downloads/latinocr-lat-0.3.0/lat.punc.txt",
+		"/Users/jacobmalcom/Downloads/latinocr-lat-0.3.0/training_text.txt",
+		"/Users/jacobmalcom/Downloads/test_convert/test_300_fax.txt",
+		"/Users/jacobmalcom/OneDrive - Defenders of Wildlife/personnel/JWM_personnel_stuff/JWM_DOW_sigimg.html",
+		"/Users/jacobmalcom/Downloads/googlebooks-eng-all-totalcounts-20120701.txt",
+		"/Users/jacobmalcom/Downloads/textcleaner",
+		"/Users/jacobmalcom/Google Drive/Defenders/ESA_docs/five_year_review/doc731.txt",
+		"/Users/jacobmalcom/Google Drive/Defenders/ESA_docs/five_year_review/test.txt",
+		"/Users/jacobmalcom/Google Drive/Defenders/ESA_docs/five_year_review/tmp/test-0.txt",
+		"/Users/jacobmalcom/Google Drive/Defenders/ESA_docs/five_year_review/doc1048.txt",
+		"/Users/jacobmalcom/Google Drive/Defenders/ESA_docs/five_year_review/doc1035.txt",
+		"/Users/jacobmalcom/test_rtf2.html",
+		"/Users/jacobmalcom/Downloads/D030_V01.RTF",
+		"/Users/jacobmalcom/Repos/defend-esc-dev/open/section7_explorer/README.md",
+		"/Volumes/DO_v1/Repos/defend-esc-dev/index.html",
+		"/Volumes/DO_v1/Repos/defend-esc-dev/config/default",
+		"/Users/jacobmalcom/Google Drive/Defenders/data/SE_planning_APericak/README.md",
+		"/Volumes/DO_v1/Repos/defend-esc-dev/open/section7_explorer/global.R",
+		"/Volumes/DO_v1/Repos/defend-esc-dev/open/section7_explorer/server.R",
+		"/Volumes/DO_v1/Repos/defend-esc-dev/open/section7_explorer/server_pages/server_single_view_page.R",
+		"/Volumes/DO_v1/Repos/defend-esc-dev/open/section7_explorer/pages/single_view_page.R",
+		"/Users/jacobmalcom/Downloads/index.html",
+		"/var/folders/fy/wcg7t12j32d0tztj7sls01g00000gn/T/sublime-sftp-browse-1459558132/defend-esc-dev/home/jacob/Repos/defend-esc-dev/index.html",
+		"/var/folders/fy/wcg7t12j32d0tztj7sls01g00000gn/T/sublime-sftp-browse-1459518673/defend-esc-dev/home/jacob/Repos/defend-esc-dev/open/section7_explorer/pages/single_view_page.R",
+		"/var/folders/fy/wcg7t12j32d0tztj7sls01g00000gn/T/sublime-sftp-browse-1459507969/defend-esc-dev/home/jacob/Repos/defend-esc-dev/open/section7_explorer/global.R",
+		"/Users/jacobmalcom/Library/Application Support/Sublime Text 3/Packages/User/sftp_servers/defend-esc-dev",
+		"/var/folders/fy/wcg7t12j32d0tztj7sls01g00000gn/T/sublime-sftp-browse-1459387074/mapped/etc/shiny-server/shiny-server.conf",
+		"/var/folders/fy/wcg7t12j32d0tztj7sls01g00000gn/T/sublime-sftp-browse-1459471572/defend-esc-dev/home/jacob/Repos/defend-esc-dev/config/shiny-server.conf",
+		"/Users/jacobmalcom/Desktop/server/sftp-config.json",
+		"/Users/jacobmalcom/Desktop/server/sites-available/default",
+		"/Users/jacobmalcom/Downloads/reply_to_post.txt",
+		"/Users/jacobmalcom/Library/Application Support/Sublime Text 3/Packages/SFTP/SFTP.py",
+		"/Users/jacobmalcom/Library/Application Support/Sublime Text 3/Packages/User/SFTP.sublime-settings",
+		"/Users/jacobmalcom/Google Drive/temp/ST3_new/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 24.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"Article I, Section 4===",
+			"Region",
+			"the info",
+			"review",
+			"california within the range",
+			"california within the range of",
+			"species status",
+			"change",
+			"differen",
+			"reflect",
+			"been",
+			"css",
+			"bs-example-modal-sm",
+			"h3"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 24.0
+	},
+	"input":
+	{
+		"height": 32.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.sftp":
+	{
+		"height": 106.0
+	},
+	"pinned_build_system": "",
+	"project": "esadocs.sublime-project",
+	"replace":
+	{
+		"height": 44.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
