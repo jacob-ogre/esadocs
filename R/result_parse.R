@@ -1,23 +1,23 @@
 # BSD_2_clause
 
-#' Extract data.frame from elasticsearch query result
+#' Extract a data.frame from Elastic query results
 #'
-#' Elasticsearch query results are returned as a complex nested list that is
+#' Elastic query results are returned as a complex nested list that is
 #' reasonably well-structured but a pain to parse. The basic \code{Search}
 #' function of \link[elastic]{elastic} has a flag, \code{asdf}, to return the
 #' results as a data.frame, but there is no generic function to extract the
-#' data.frame. This function is tailored to the esadocs2 index, used in testing,
+#' data.frame. This function is tailored to the esadocs index, used in testing,
 #' which includes a field (Scientific_Name) that is an array in elasticsearch
 #' (list in R) and doesn't coerce to a single variable just using
-#' \code{as.data.frame}.
+#' \code{as.data.frame(res)}.
 #'
 #' @param res An elasticsearch query result
 #' @return A data.frame of document results
 #' @importFrom dplyr bind_rows
 #' @export
 result_asdf <- function(res) {
-  score_ls <- list()
-  res_ls <- list()
+  score_ls <- vector("list", length(res))
+  res_ls <- vector("list", length(res))
   for(i in 1:length(res)) {     # NOTE: lapply doesn't work in this case
     score_ls[[i]] <- res[[i]]$`_score`
     spp_tmp <- paste(res[[i]]$`_source`$Scientific_Name, collapse = "<br>")

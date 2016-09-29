@@ -32,7 +32,6 @@ load_doc_text <- function(path) {
   return(paste(readLines(path), collapse = " "))
 }
 
-
 #' Test for NULL/NA/logical classes where these classes aren't expected
 #'
 #' @param x The object to be tested

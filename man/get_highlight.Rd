@@ -7,7 +7,7 @@
 get_highlight(res)
 }
 \arguments{
-\item{res}{An elasticsearch result object}
+\item{res}{An Elastic result object}
 }
 \value{
 A vector of highlighted matches
@@ -15,8 +15,5 @@ A vector of highlighted matches
 \description{
 Highlighting the matched text can be used in displaying the search
 results, much as The Google does.
-}
-\seealso{
-\link{abbreviate}
 }
 

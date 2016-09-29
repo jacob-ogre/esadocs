@@ -1,5 +1,5 @@
 {
-  "recovery_plan": {
+  "section_7a2": {
     "properties": {
       "link": {
         "type": "string",
@@ -47,6 +47,14 @@
         "index": "not_analyzed"
       },
       "species": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "activity_code": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "federal_agency": {
         "type": "string",
         "index": "not_analyzed"
       },

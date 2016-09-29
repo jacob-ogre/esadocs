@@ -9,15 +9,15 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "Date": {
+      "date": {
         "type": "date",
         "index": "not_analyzed"
       },
-      "Citation Page": {
+      "fr_citation_page": {
         "type": "string",
         "index": "not_analyzed"
       },
-      "Title": {
+      "title": {
         "type": "string",
         "index": "not_analyzed"
       },
@@ -50,7 +50,11 @@
         "type": "long",
         "index": "not_analyzed"
       },
-      "Species": {
+      "species": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "tags": {
         "type": "string",
         "index": "not_analyzed"
       }
