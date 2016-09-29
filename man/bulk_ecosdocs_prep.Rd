@@ -4,7 +4,7 @@
 \alias{bulk_ecosdocs_prep}
 \title{description 1-liner}
 \usage{
-bulk_ecosdocs_prep(docs, dates)
+bulk_ecosdocs_prep(docs, dates, doctype)
 }
 \arguments{
 \item{paramName}{explanation}

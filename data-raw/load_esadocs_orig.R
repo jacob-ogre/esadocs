@@ -50,17 +50,8 @@ fiveyr <- filter(ecos_doc_links, type == "five_year_review")
 names(fedreg) <- c("species", "Doc_Link", "link", "text", "type")
 names(recpln) <- c("species", "Doc_Link", "link", "text", "type")
 names(fiveyr) <- c("species", "Doc_Link", "link", "text", "type")
-# tmp <- bulk_ecosdocs_prep(fedreg, federal_register_table, "federal_register")
+tmp <- bulk_ecosdocs_prep(fedreg, federal_register_table, "federal_register")
 
-test <- list()
-brks <- seq(1, 300, 100)
-for(i in 1:length(brks)) {
-  test[[i]] <- bulk_ecosdocs_prep(fedreg[brks[i]:(brks[i] + 99), ],
-                                  federal_register_table,
-                                  "federal_register")
-}
-cur_res <- bind_rows(test)
-rm(test)
 
 ###############################################################################
 # 3. Load the prepped data into elastic indices
