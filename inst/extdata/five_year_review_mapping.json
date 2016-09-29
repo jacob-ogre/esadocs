@@ -1,4 +1,5 @@
-  "recovery_plan": {
+{
+  "five_year_review": {
     "properties": {
       "link": {
         "type": "string",
@@ -51,3 +52,4 @@
       }
     }
   }
+}

@@ -1,4 +1,5 @@
-  "five_year_review": {
+{
+  "federal_register": {
     "properties": {
       "link": {
         "type": "string",
@@ -10,6 +11,10 @@
       },
       "Date": {
         "type": "date",
+        "index": "not_analyzed"
+      },
+      "Citation Page": {
+        "type": "string",
         "index": "not_analyzed"
       },
       "Title": {
@@ -51,3 +56,4 @@
       }
     }
   }
+}

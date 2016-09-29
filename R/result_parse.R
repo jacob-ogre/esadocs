@@ -36,12 +36,14 @@ result_asdf <- function(res) {
 #' Highlighting the matched text can be used in displaying the search
 #' results, much as The Google does.
 #'
-#' @param res An elasticsearch result object
+#' @param res An Elastic result object
 #' @return A vector of highlighted matches
-#' @seealso \link{abbreviate}
 #' @export
 get_highlight <- function(res) {
-  res_ls = list()
+  res_ls = vector("list", length(res))
+
+  # unfortunately, lapply doesn't seem to work well over an ES result object,
+  # at least not without getting way more complicated than using a for loop
   for(i in 1:length(res)) {
     hi_tmp <- lapply(res[[i]]$highlight, FUN = abbrev)
     hi_tmp <- str_replace_all(hi_tmp,
@@ -53,16 +55,10 @@ get_highlight <- function(res) {
   return(res_vec)
 }
 
-#' Abbreviate multiple matches
-#'
-#' Concatenates with ' ... '
-#'
-#' @param x A vector of highlighted match strings
-#' @return A concatenated version from <= 3 match elements
 abbrev <- function(x) {
   if(length(x) > 3) {
-    paste(x[1:3], collapse = "...")
+    paste(x[1:3], collapse = " ... ")
   } else {
-    paste(x, collapse = "...")
+    paste(x, collapse = " ... ")
   }
 }

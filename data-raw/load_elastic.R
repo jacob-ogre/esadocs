@@ -159,12 +159,12 @@ po <- jsonlite::fromJSON(hj)
 connect()
 index_delete("esadocs2")
 index_create("esadocs2", body = hj)
-bulk <- docs_bulk(ee, index = "esadocs2", type = "federal_register")
+bulk <- docs_bulk(ee, index = "esadocs", type = "federal_register")
 
 index_analyze(text = "Fish and Wildlife Service",
               index = "esadocs2")
 
-ll <- Search(index = "esadocs2",
+ll <- Search(index = "esadocs",
              q = "Fish and Wildlife",
              analyzer = "esadocs_analyzer",
              size = 25)

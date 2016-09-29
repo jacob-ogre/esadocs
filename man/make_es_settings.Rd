@@ -2,26 +2,42 @@
 % Please edit documentation in R/es_settings.R
 \name{make_es_settings}
 \alias{make_es_settings}
-\title{Make elasticsearch index and search settings object from JSONs}
+\title{Make elastic settings object from JSONs}
 \usage{
-make_es_settings(analyzers = list(), mappings = list())
+make_es_settings(analyzers = c(), mappings = c())
 }
 \arguments{
-\item{analyzers}{A list of zero or more analyzers to include in settings}
+\item{analyzers}{A vector of zero or more analyzers to include in settings}
 
-\item{mappings}{A list of one or more document mappings to include}
+\item{mappings}{A vector of one or more document mappings to include}
 }
 \value{
-A list of elasticsearch settings
+A JSON of elasticsearch settings
 }
 \description{
-<Need to add more...>
+Better indexing and search with elastic requires customizing the settings
+(e.g., analyzers) and document mappings. Both components are sent to elastic
+in JSON, and we store the individual JSON entries in separate files in
+inst/extdata. For example, \code{esadocs_analyzer.json} is a single object
+for the app's elastic analyzer, and each document type (Fed. Reg. docs,
+recovery plans, etc.) has its own JSON file.
+}
+\details{
+While I would like to just use one JSON parser across the entire esadocs
+package, there's a hiccup. \code{jsonlite} is actively maintained and has a
+public GitHub repo, but it handles terminal JSON values in a way that elastic
+doesn't like (converts all values to an array). In contrast, \code{RJSONIO},
+which doesn't appear to be actively maintained, handles terminal values
+'correctly' for elastic. So we have to use it here.
 }
 \examples{
-make_es_settings(analyzers = list(esadocs_analyzer()),
-                 mappings = list(fed_ref_mapping(), rec_plan_mapping()))
+analyzer <- load_es_json("data-raw/esadocs_analyzer.json")
+fedreg <- load_es_json("data-raw/federal_register_mapping.json")
+recplan <- load_es_json("data-raw/recovery_plan_mapping")
+make_es_settings(analyzers = c(analyzer),
+                 mappings = c(fedreg, recplan)
 }
 \seealso{
-\link{esadocs_analyzer} \link{fed_reg_mapping}
+\link{load_es_json}
 }
 

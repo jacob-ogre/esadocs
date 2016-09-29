@@ -10,28 +10,20 @@ library(tools)
 ###############################################################################
 # 1. Set up elastic indices
 
-analyzer <- paste(readLines("data-raw/esadocs_analyzer.json"), collapse = "\n")
+analyzer <- load_es_json("inst/extdata/esadocs_analyzer.json")
+fedreg <-  load_es_json("inst/extdata/federal_register_mapping.json")
+fiveyr <-  load_es_json("inst/extdata/five_year_review_mapping.json")
+recplan <- load_es_json("inst/extdata/recovery_plan_mapping.json")
 
-fedreg <-  paste(readLines("data-raw/federal_register_mapping.json"),
-                 collapse = "\n")
-
-fiveyr <-  paste(readLines("data-raw/five_year_review_mapping.json"),
-                          collapse = "\n")
-
-recplan <-  paste(readLines("data-raw/recovery_plan_mapping.json"),
-                           collapse = "\n")
-
-settings <- make_es_settings(analyzer = list(analyzer),
-                             mappings = list(
+settings <- make_es_settings(analyzer = c(analyzer),
+                             mappings = c(
                                fedreg,
                                fiveyr,
                                recplan
                              ))
-
 connect()
 index_delete("esadocs")
 index_create("esadocs", body = settings)
-
 
 
 
