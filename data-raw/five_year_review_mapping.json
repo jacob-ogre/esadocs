@@ -1,0 +1,53 @@
+  "five_year_review": {
+    "properties": {
+      "link": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "type": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "Date": {
+        "type": "date",
+        "index": "not_analyzed"
+      },
+      "Title": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "pdf": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "txt": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "pdf_path": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "txt_path": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "raw_txt": {
+        "type": "string",
+        "index": "analyzed",
+        "analyzer": "esadocs_analyzer"
+      },
+      "pdf_md5": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "pdf_size": {
+        "type": "long",
+        "index": "not_analyzed"
+      },
+      "Species": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  }

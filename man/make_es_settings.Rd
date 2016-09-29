@@ -2,7 +2,7 @@
 % Please edit documentation in R/es_settings.R
 \name{make_es_settings}
 \alias{make_es_settings}
-\title{Make elasticsearch index and search settings object}
+\title{Make elasticsearch index and search settings object from JSONs}
 \usage{
 make_es_settings(analyzers = list(), mappings = list())
 }
