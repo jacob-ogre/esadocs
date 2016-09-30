@@ -53,8 +53,7 @@ names(fiveyr) <- c("species", "Doc_Link", "link", "text", "type")
 
 fr_dat <- bulk_fedreg_prep(fedreg, federal_register_table)
 rp_dat <- bulk_recplan_prep(recpln, recovery_plan_table)
-fy_dat <- bulk_fiveyr_prep(fiveyr, five_year_table)
-
+fy_dat <- bulk_fiveyr_prep(fiveyr, five_year_review_table)
 
 ###############################################################################
 # 3. Load the prepped data into elastic indices
