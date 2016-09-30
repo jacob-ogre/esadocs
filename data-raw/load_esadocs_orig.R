@@ -57,42 +57,7 @@ fy_dat <- bulk_fiveyr_prep(fiveyr, five_year_review_table)
 ###############################################################################
 # 3. Load the prepped data into elastic indices
 
-# brks <- seq(1, length(fr_dat[, 1]), 100)
-# for(i in 1:length(brks)) {
-#   if(brks[i] + 99 < length(fr_dat[,1])) {
-#     cur_tst <- add_raw_txt(fr_dat[brks[i]:(brks[i] + 99), ])
-#   } else {
-#     cur_tst <- add_raw_txt(fr_dat[brks[i]:length(fr_dat[, 1]), ])
-#   }
-#   connect()
-#   index_settings("esadocs")
-#   bulk <- docs_bulk(cur_tst, index = "esadocs", type = "federal_register")
-#   cat(sprintf("Added records %s to %s\n", brks[i], brks[i] + 99))
-# }
-
 chunked_es_loading(fr_dat, index = "esadocs", type = "federal_register")
+chunked_es_loading(rp_dat, index = "esadocs", type = "recovery_plan")
+chunked_es_loading(fy_dat, index = "esadocs", type = "five_year_review")
 
-brks <- seq(1, length(rp_dat[, 1]), 100)
-for(i in 1:length(brks)) {
-  if(brks[i] + 99 < length(rp_dat[,1])) {
-    cur_tst <- add_raw_txt(rp_dat[brks[i]:(brks[i] + 99), ])
-  } else {
-    cur_tst <- add_raw_txt(rp_dat[brks[i]:length(rp_dat[, 1]), ])
-  }
-  connect()
-  bulk <- docs_bulk(cur_tst, index = "esadocs", type = "recovery_plan")
-  cat(sprintf("Added records %s to %s\n", brks[i], brks[i] + 99))
-}
-
-brks <- seq(1, length(fy_dat[, 1]), 100)
-print(sprintf("%s documents to add\n", length(fy_dat[, 1])))
-connect()
-for(i in 1:length(brks)) {
-  if(brks[i] + 99 < length(fy_dat[,1])) {
-    cur_tst <- add_raw_txt(fy_dat[brks[i]:(brks[i] + 99), ])
-  } else {
-    cur_tst <- add_raw_txt(fy_dat[brks[i]:length(fy_dat[, 1]), ])
-  }
-  bulk <- docs_bulk(cur_tst, index = "esadocs", type = "five_year_review")
-  cat(sprintf("Added records %s to %s\n", brks[i], brks[i] + 99))
-}
