@@ -11,26 +11,26 @@ library(tools)
 ###############################################################################
 # 1. Set up elastic indices
 
-analyzer <- load_es_json("inst/extdata/esadocs_analyzer.json")
-fedreg <-  load_es_json("inst/extdata/federal_register_mapping.json")
-fiveyr <-  load_es_json("inst/extdata/five_year_review_mapping.json")
-recplan <- load_es_json("inst/extdata/recovery_plan_mapping.json")
-s7a2 <- load_es_json("inst/extdata/consultation_mapping.json")
+analyzer_json <- load_es_json("inst/extdata/esadocs_analyzer.json")
+fedreg_json <-  load_es_json("inst/extdata/federal_register_mapping.json")
+fiveyr_json <-  load_es_json("inst/extdata/five_year_review_mapping.json")
+recplan_json <- load_es_json("inst/extdata/recovery_plan_mapping.json")
+s7a2_json <- load_es_json("inst/extdata/consultation_mapping.json")
 
-settings <- make_es_settings(analyzer = c(analyzer),
+settings <- make_es_settings(analyzer = c(analyzer_json),
                              mappings = c(
-                               fedreg,
-                               fiveyr,
-                               recplan,
-                               s7a2
+                               fedreg_json,
+                               fiveyr_json,
+                               recplan_json,
+                               s7a2_json
                              ))
 connect()
 index_delete("esadocs")
 index_create("esadocs", body = settings)
-index_settings()
+# index_settings()
 
 # cleanup
-rm(list = c("analyzer", "fedreg", "fiveyr", "recplan", "s7a2"))
+rm(list = c("analyzer_json", "fedreg_json", "fiveyr_json", "recplan_json", "s7a2_json"))
 
 ###############################################################################
 # 2. Load and prep the data from .rda
@@ -57,3 +57,43 @@ fy_dat <- bulk_fiveyr_prep(fiveyr, five_year_review_table)
 
 ###############################################################################
 # 3. Load the prepped data into elastic indices
+
+# brks <- seq(1, length(fr_dat[, 1]), 100)
+# for(i in 1:length(brks)) {
+#   if(brks[i] + 99 < length(fr_dat[,1])) {
+#     cur_tst <- add_raw_txt(fr_dat[brks[i]:(brks[i] + 99), ])
+#   } else {
+#     cur_tst <- add_raw_txt(fr_dat[brks[i]:length(fr_dat[, 1]), ])
+#   }
+#   connect()
+#   index_settings("esadocs")
+#   bulk <- docs_bulk(cur_tst, index = "esadocs", type = "federal_register")
+#   cat(sprintf("Added records %s to %s\n", brks[i], brks[i] + 99))
+# }
+
+chunked_es_loading(fr_dat, index = "esadocs", type = "federal_register")
+
+brks <- seq(1, length(rp_dat[, 1]), 100)
+for(i in 1:length(brks)) {
+  if(brks[i] + 99 < length(rp_dat[,1])) {
+    cur_tst <- add_raw_txt(rp_dat[brks[i]:(brks[i] + 99), ])
+  } else {
+    cur_tst <- add_raw_txt(rp_dat[brks[i]:length(rp_dat[, 1]), ])
+  }
+  connect()
+  bulk <- docs_bulk(cur_tst, index = "esadocs", type = "recovery_plan")
+  cat(sprintf("Added records %s to %s\n", brks[i], brks[i] + 99))
+}
+
+brks <- seq(1, length(fy_dat[, 1]), 100)
+print(sprintf("%s documents to add\n", length(fy_dat[, 1])))
+connect()
+for(i in 1:length(brks)) {
+  if(brks[i] + 99 < length(fy_dat[,1])) {
+    cur_tst <- add_raw_txt(fy_dat[brks[i]:(brks[i] + 99), ])
+  } else {
+    cur_tst <- add_raw_txt(fy_dat[brks[i]:length(fy_dat[, 1]), ])
+  }
+  bulk <- docs_bulk(cur_tst, index = "esadocs", type = "five_year_review")
+  cat(sprintf("Added records %s to %s\n", brks[i], brks[i] + 99))
+}

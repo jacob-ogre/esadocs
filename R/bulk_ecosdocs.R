@@ -84,3 +84,33 @@ bulk_fiveyr_prep <- function(docs, dates) {
   df$pdf_size <- file.size(normalizePath(df$pdf_path))
   return(df)
 }
+
+#' Add raw text to a data.frame for loading to Elastic
+#'
+#' We use text extracted from PDFs with \link[pdftext]{pdftext} for full-text
+#' search with Elastic, added in a single field, \code{raw_txt}. The volume of
+#' data in \code{raw_txt} can be rather large; we recommend that it is added
+#'
+#' @param df A data.frame from a \code{bulk_*_prep} function, with txt_path var
+#' @return df, with a raw_txt variable filled using readLines
+#' @export
+#' @examples
+#' one or more lines to demo the function
+add_raw_txt <- function(df) {
+  df$raw_txt <- unlist(lapply(df$txt_path, load_doc_text))
+  return(df)
+}
+
+chunked_es_loading <- function(df, index = "esadocs", type) {
+  connect()
+  brks <- seq(1, length(df[, 1]), 100)
+  for(i in 1:length(brks)) {
+    st <- brks[i]
+    en <- ifelse(brks[i] + 99 < length(df[, 1]),
+                 brks[i] + 99,
+                 length(df[, 1]))
+    cur_tst <- add_raw_txt(df[st:en, ])
+    bulk <- docs_bulk(cur_tst, index = index, type = type)
+    message(sprintf("Added records %s to %s\n", st, en))
+  }
+}

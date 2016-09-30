@@ -20,14 +20,18 @@ result_asdf <- function(res) {
   res_ls <- vector("list", length(res))
   for(i in 1:length(res)) {     # NOTE: lapply doesn't work in this case
     score_ls[[i]] <- res[[i]]$`_score`
-    spp_tmp <- paste(res[[i]]$`_source`$Scientific_Name, collapse = "<br>")
+    spp_tmp <- paste(res[[i]]$`_source`$species, collapse = "<br>")
     n_vars <- length(res[[i]]$`_source`)
-    rest <- res[[i]]$`_source`[1:n_vars-1]
-    cur_dat <- data.frame(rest, Species = spp_tmp, stringsAsFactors = FALSE)
+    href <- res[[i]]$`_source`$href
+    rest <- res[[i]]$`_source`[3:n_vars]
+    cur_dat <- data.frame(href = href,
+                          rest,
+                          species = spp_tmp,
+                          stringsAsFactors = FALSE)
     res_ls[[i]] <- cur_dat
   }
   res_df <- suppressWarnings(dplyr::bind_rows(res_ls))
-  res_df$Score <- unlist(score_ls)
+  res_df$score <- unlist(score_ls)
   return(res_df)
 }
 

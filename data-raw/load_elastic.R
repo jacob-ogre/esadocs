@@ -165,12 +165,11 @@ index_analyze(text = "Fish and Wildlife Service",
               index = "esadocs2")
 
 ll <- Search(index = "esadocs",
-             q = "Fish and Wildlife",
              analyzer = "esadocs_analyzer",
              size = 25)
-ll <- Search(index = "esadocs2",
-             q = "flower^5",
-             analyzer = "my_ngram_analyzer",
+ll <- Search(index = "esadocs",
+             q = "Chiricahua",
+             analyzer = "esadocs_analyzer",
              size = 25)
 pl <- result_asdf(ll$hits$hits)
 
@@ -182,7 +181,7 @@ body1 <- '{
     "query": {
       "simple_query_string": {
         "query": "{{my_value}}",
-        "analyzer": "my_ngram_analyzer",
+        "analyzer": "esadocs_analyzer",
         "fields": [ "{{my_field}}" ],
         "default_operator": "and"
       }
@@ -199,7 +198,7 @@ body1 <- '{
   },
   "params" : {
     "my_field" : "raw_txt",
-    "my_value" : "\\"fish and wildlife\\"",
+    "my_value" : "fish and wildlife",
     "my_size" : 20
   }
 }'
