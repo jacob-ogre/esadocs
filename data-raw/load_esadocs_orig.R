@@ -50,7 +50,10 @@ fiveyr <- filter(ecos_doc_links, type == "five_year_review")
 names(fedreg) <- c("species", "Doc_Link", "link", "text", "type")
 names(recpln) <- c("species", "Doc_Link", "link", "text", "type")
 names(fiveyr) <- c("species", "Doc_Link", "link", "text", "type")
-tmp <- bulk_ecosdocs_prep(fedreg, federal_register_table, "federal_register")
+
+fr_dat <- bulk_fedreg_prep(fedreg, federal_register_table)
+rp_dat <- bulk_recplan_prep(recpln, recovery_plan_table)
+fy_dat <- bulk_fiveyr_prep(fiveyr, five_year_table)
 
 
 ###############################################################################
