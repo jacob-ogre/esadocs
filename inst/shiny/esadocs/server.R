@@ -29,7 +29,7 @@ shinyServer(function(input, output, session) {
 
   # the number of indexed documents; could change to an option() later
   output$n_docs <- renderText({
-    tmp <- index_stats("esadocs2")$indices$esadocs2$total$docs$count
+    tmp <- index_stats("esadocs")$indices$esadocs$total$docs$count
     return(paste(tmp, "documents indexed"))
   })
 
@@ -77,33 +77,35 @@ shinyServer(function(input, output, session) {
     # }
 
     body <- list(
-      inline = list(query = list(match = list(`{{my_field}}` = "{{my_value}}")),
-                    size = "{{my_size}}",
-                    highlight = list(
-                      fields = list(
-                        `{{my_field}}` = list(
-                          `fragment_size` = 150,
-                          `pre_tags` = list("<b>"),
-                          `post_tags` = list("</b>")
-                          )
-                        )
+      inline = list(
+                 query = list(
+                   match = list(
+                     `{{my_field}}` = "{{my_value}}"
+                    )
+                  ),
+                  size = "{{my_size}}",
+                  highlight = list(
+                    fields = list(
+                      `{{my_field}}` = list(
+                        `fragment_size` = 150,
+                        `pre_tags` = list("<b>"),
+                        `post_tags` = list("</b>")
                       )
-                    ),
+                    )
+                  )
+                 ),
       params = list(my_field = "raw_txt",
                     my_value = cur_input(),
-                    my_size = 50L)
+                    my_size = 500)
     )
     cur_mats <- Search_template(body = body)$hits$hits
     if(length(cur_mats) > 0) {
       res_df <- result_asdf(cur_mats)
       res_df$highlight <- get_highlight(cur_mats)
-      ######### REMOVE AFTER CORRECT LOADING!
-      res_df$Date <- as.Date(res_df$Date)
-      #########
       res_df <- filter(res_df,
-                       is.na(res_df$Date) |
-                       (res_df$Date >= date_filter()[1] &
-                        res_df$Date <= date_filter()[2]))
+                       is.na(res_df$date) |
+                       (res_df$date >= date_filter()[1] &
+                        res_df$date <= date_filter()[2]))
       if(input$type_filt != "all") {
         res_df <- filter(res_df, res_df$type == input$type_filt)
       }
@@ -145,8 +147,8 @@ shinyServer(function(input, output, session) {
             a(href = data$link[i],
               target = "_blank",
               span(
-                ifelse(nchar(data$Title[i]) > 10 & !is.na(data$Title[i]),
-                       data$Title[i],
+                ifelse(nchar(data$title[i]) > 10 & !is.na(data$title[i]),
+                       data$title[i],
                        "No document title"),
                 style = "font-size:larger;font-weight:bold"
               )
@@ -160,12 +162,12 @@ shinyServer(function(input, output, session) {
               column(3,
                 div(class = "info-div",
                     icon("calendar"),
-                    data$Date[i])
+                    data$date[i])
               ),
               column(3,
                 div(class = "info-div",
                     icon("star"),
-                    paste("Score:", round(data$Score[i], 3)))
+                    paste("Score:", round(data$score[i], 3)))
               ),
               column(3)
             ),
@@ -184,7 +186,7 @@ shinyServer(function(input, output, session) {
                     style = "default"
                   ),
                   title = "Relevant species",
-                  content = HTML(data$Species[i]),
+                  content = HTML(data$species[i]),
                   placement = "right",
                   trigger = "focus"
                 )
@@ -208,33 +210,7 @@ shinyServer(function(input, output, session) {
               )
             )
           ),
-          column(2 #,
-            # div(
-            #   a(href = data$link[i],
-            #     target = "_blank",
-            #     style = "color:#cc0000",
-            #     icon("file-pdf-o", "fa-2x"),
-            #     "PDF"
-            #   )
-            # ),
-            # br(),
-            # popify(
-            #   div(
-            #     actionLink(
-            #       inputId = paste0("rawtxt", i),
-            #       label = NULL,
-            #       icon = icon("file-text-o", "fa-2x"),
-            #       "TXT"
-            #     )
-            #   ),
-            #   title = "Raw text",
-            #   content = paste(
-            #     str_sub(data$raw_txt[i], 1, 750),
-            #     "....."),
-            #   placement = "right",
-            #   trigger = "focus"
-            # )
-          )
+          column(2)
         )
         ),
         div(style = "background:rgba(0,0,0,0)",
@@ -309,7 +285,7 @@ shinyServer(function(input, output, session) {
     }
     toggle("summ_head")
     output$score_plot <- renderPlot({
-      dat <- data.frame(score = cur_res()$Score)
+      dat <- data.frame(score = cur_res()$score)
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
@@ -322,7 +298,7 @@ shinyServer(function(input, output, session) {
     })
 
     output$date_plot <- renderPlot({
-      dat <- data.frame(date = as.Date(cur_res()$Date))
+      dat <- data.frame(date = as.Date(cur_res()$date))
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
@@ -336,7 +312,7 @@ shinyServer(function(input, output, session) {
 
     output$top_spp <- renderPlot({
     spp_list <- str_split(
-      paste(cur_res()$Species, collapse = "<br>"),
+      paste(cur_res()$species, collapse = "<br>"),
       "<br>")
     spp_tab <- sort(table(spp_list), decreasing = TRUE)[1:10]
     spp_df <- data.frame(species = names(spp_tab),

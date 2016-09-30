@@ -13,7 +13,9 @@ add_raw_txt(df)
 df, with a raw_txt variable filled using readLines
 }
 \description{
-Add raw text to a data.frame for loading to Elastic
+We use text extracted from PDFs with \link[pdftext]{pdftext} for full-text
+search with Elastic, added in a single field, \code{raw_txt}. The volume of
+data in \code{raw_txt} can be rather large; we recommend that it is added
 }
 \examples{
 one or more lines to demo the function

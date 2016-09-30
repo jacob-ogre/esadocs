@@ -66,3 +66,4 @@ abbrev <- function(x) {
     paste(x, collapse = " ... ")
   }
 }
+

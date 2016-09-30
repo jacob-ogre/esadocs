@@ -5,7 +5,7 @@
 #' @param q The input query
 #' @return Query formatted for query_string or simple_query_string
 #' @export
-raw_query_parser <- function(q) {
+build_query <- function(q) {
   if(stringr::str_match_all(q, "\"")) {
     # parse quoted string
   }

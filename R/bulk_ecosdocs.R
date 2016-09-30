@@ -12,6 +12,8 @@
 #' #one or more lines to demo the function
 bulk_fedreg_prep <- function(docs, dates) {
   spp_links <- aggregate(species ~ Doc_Link, data = docs, FUN = unique)
+  spp_links
+  return(head(spp_links))
   df <- left_join(spp_links, dates, by = c("Doc_Link")) %>%
           distinct(species, .keep_all = TRUE) %>%
           select(-Species)
