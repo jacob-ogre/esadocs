@@ -61,3 +61,8 @@ chunked_es_loading(fr_dat, index = "esadocs", type = "federal_register")
 chunked_es_loading(rp_dat, index = "esadocs", type = "recovery_plan")
 chunked_es_loading(fy_dat, index = "esadocs", type = "five_year_review")
 
+# checks
+stats <- index_stats("esadocs")
+sprintf("%s documents", stats$indices$esadocs$total$docs$count)
+sprintf("%s bytes", stats$indices$esadocs$total$store$size_in_bytes)
+
