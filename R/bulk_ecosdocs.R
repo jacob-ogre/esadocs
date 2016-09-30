@@ -26,6 +26,8 @@ bulk_fedreg_prep <- function(docs, dates) {
   message("Starting MD5 calculations...")
   df$pdf_md5 <- md5sum(normalizePath(df$pdf_path))
   df$pdf_size <- file.size(normalizePath(df$pdf_path))
+  df$placenames <- rep("", length(df[, 1]))
+  df$tags <- rep("", length(df[, 1]))
   return(df)
 }
 
@@ -54,6 +56,8 @@ bulk_recplan_prep <- function(docs, dates) {
   message("Starting MD5 calculations...")
   df$pdf_md5 <- md5sum(normalizePath(df$pdf_path))
   df$pdf_size <- file.size(normalizePath(df$pdf_path))
+  df$placenames <- rep("", length(df[, 1]))
+  df$tags <- rep("", length(df[, 1]))
   return(df)
 }
 
@@ -82,6 +86,8 @@ bulk_fiveyr_prep <- function(docs, dates) {
   message("Starting MD5 calculations...")
   df$pdf_md5 <- md5sum(normalizePath(df$pdf_path))
   df$pdf_size <- file.size(normalizePath(df$pdf_path))
+  df$placenames <- rep("", length(df[, 1]))
+  df$tags <- rep("", length(df[, 1]))
   return(df)
 }
 
@@ -101,6 +107,23 @@ add_raw_txt <- function(df) {
   return(df)
 }
 
+#' Add ESAdocs to Elastic in 100-doc chunks
+#'
+#' The raw text of ESA docs can be rather large; rather than trying to hold
+#' all of the text for all docs in a single data.frame, then load the data.frame
+#' to Elastic in one fell swoop, we take a chunking approach. The raw text is
+#' read in to the data.frame with \link{add_raw_txt} for each doc in each
+#' 100-doc chunk, then that chunk is loaded using \link[elastic]{docs_bulk}
+#'
+#' @param df A docs data.frame from \code{bulk_*_prep}
+#' @param index The index into which documents are loaded
+#' @param type The document type in df
+#' @return Nothing; chunking messages are printed during processing
+#' @export
+#' @examples
+#' \dontrun{
+#' chunked_es_loading(fr_dat, "esadocs", "federal_register")
+#' }
 chunked_es_loading <- function(df, index = "esadocs", type) {
   connect()
   brks <- seq(1, length(df[, 1]), 100)

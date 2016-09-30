@@ -27,7 +27,6 @@ settings <- make_es_settings(analyzer = c(analyzer_json),
 connect()
 index_delete("esadocs")
 index_create("esadocs", body = settings)
-# index_settings()
 
 # cleanup
 rm(list = c("analyzer_json", "fedreg_json", "fiveyr_json", "recplan_json", "s7a2_json"))
