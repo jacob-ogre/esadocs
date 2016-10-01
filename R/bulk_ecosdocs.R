@@ -12,24 +12,26 @@
 #' #one or more lines to demo the function
 bulk_fedreg_prep <- function(docs, dates) {
   spp_links <- aggregate(species ~ Doc_Link, data = docs, FUN = unique)
-  spp_links
-  return(head(spp_links))
+  spp_links <- left_join(spp_links, docs, by = "Doc_Link")
+  spp_links <- distinct(spp_links, species.x, .keep_all = TRUE)
+  spp_links <- select(spp_links, -species.y, -type)
   df <- left_join(spp_links, dates, by = c("Doc_Link")) %>%
-          distinct(species, .keep_all = TRUE) %>%
-          select(-Species)
+          distinct(species.x, .keep_all = TRUE) %>%
+          select(-Species, -Title)
   df$type <- rep(docs$type[1], length(df[,1]))
   df$pdf <- unlist(lapply(lapply(df$Doc_Link, make_file_paths), `[[`, 1))
   df$txt <- unlist(lapply(lapply(df$Doc_Link, make_file_paths), `[[`, 2))
   df$pdf_path <- paste0("~/esadocs/", df$type, "/PDFs/", df$pdf)
   df$txt_path <- paste0("~/esadocs/", df$type, "/TXTs/", df$txt)
   df$Date <- as.Date(df$Date)
-  names(df) <- c("href", "species", "date", "fr_citation_page", "title",
+  names(df) <- c("href", "species", "link", "title", "date", "fr_citation_page",
                  "type", "pdf", "txt", "pdf_path", "txt_path")
   message("Starting MD5 calculations...")
   df$pdf_md5 <- md5sum(normalizePath(df$pdf_path))
   df$pdf_size <- file.size(normalizePath(df$pdf_path))
   df$placenames <- rep("", length(df[, 1]))
   df$tags <- rep("", length(df[, 1]))
+  df <- select(df, -href)
   return(df)
 }
 
@@ -45,10 +47,13 @@ bulk_fedreg_prep <- function(docs, dates) {
 #' #one or more lines to demo the function
 bulk_recplan_prep <- function(docs, dates) {
   spp_links <- aggregate(species ~ Doc_Link, data = docs, FUN = unique)
+  spp_links <- left_join(spp_links, docs, by = "Doc_Link")
+  spp_links <- distinct(spp_links, species.x, .keep_all = TRUE)
+  spp_links <- select(spp_links, -species.y, -type)
   df <- left_join(spp_links, dates, by = c("Doc_Link")) %>%
-          distinct(species, .keep_all = TRUE) %>%
-          select(-Species, -`Plan Action Status`)
-  names(df) <- c("href", "species", "date", "title", "plan_status")
+          distinct(species.x, .keep_all = TRUE) %>%
+          select(-Species, -`Plan Action Status`, -Title)
+  names(df) <- c("href", "species", "link", "title", "date", "plan_status")
   df$type <- rep(docs$type[1], length(df[,1]))
   df$pdf <- unlist(lapply(lapply(df$href, make_file_paths), `[[`, 1))
   df$txt <- unlist(lapply(lapply(df$href, make_file_paths), `[[`, 2))
@@ -75,10 +80,13 @@ bulk_recplan_prep <- function(docs, dates) {
 #' #one or more lines to demo the function
 bulk_fiveyr_prep <- function(docs, dates) {
   spp_links <- aggregate(species ~ Doc_Link, data = docs, FUN = unique)
+  spp_links <- left_join(spp_links, docs, by = "Doc_Link")
+  spp_links <- distinct(spp_links, species.x, .keep_all = TRUE)
+  spp_links <- select(spp_links, -species.y, -type)
   df <- left_join(spp_links, dates, by = c("Doc_Link")) %>%
-          distinct(species, .keep_all = TRUE) %>%
-          select(-Species)
-  names(df) <- c("href", "species", "date", "title")
+          distinct(species.x, .keep_all = TRUE) %>%
+          select(-Species, -Title)
+  names(df) <- c("href", "species", "link", "title", "date")
   df$type <- rep(docs$type[1], length(df[,1]))
   df$pdf <- unlist(lapply(lapply(df$href, make_file_paths), `[[`, 1))
   df$txt <- unlist(lapply(lapply(df$href, make_file_paths), `[[`, 2))

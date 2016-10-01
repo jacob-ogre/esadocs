@@ -22,9 +22,9 @@ result_asdf <- function(res) {
     score_ls[[i]] <- res[[i]]$`_score`
     spp_tmp <- paste(res[[i]]$`_source`$species, collapse = "<br>")
     n_vars <- length(res[[i]]$`_source`)
-    href <- res[[i]]$`_source`$href
+    link <- res[[i]]$`_source`$link
     rest <- res[[i]]$`_source`[3:n_vars]
-    cur_dat <- data.frame(href = href,
+    cur_dat <- data.frame(link = link,
                           rest,
                           species = spp_tmp,
                           stringsAsFactors = FALSE)

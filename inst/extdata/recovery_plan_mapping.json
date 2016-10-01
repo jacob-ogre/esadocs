@@ -1,6 +1,10 @@
 {
   "recovery_plan": {
     "properties": {
+      "href": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
       "link": {
         "type": "string",
         "index": "not_analyzed"
@@ -36,7 +40,7 @@
       "raw_txt": {
         "type": "string",
         "index": "analyzed",
-        "term_vector": "yes",
+        "term_vector": "with_positions_offsets",
         "analyzer": "esadocs_analyzer"
       },
       "pdf_md5": {

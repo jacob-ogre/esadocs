@@ -57,6 +57,7 @@ fy_dat <- bulk_fiveyr_prep(fiveyr, five_year_review_table)
 ###############################################################################
 # 3. Load the prepped data into elastic indices
 
+connect()
 chunked_es_loading(fr_dat, index = "esadocs", type = "federal_register")
 chunked_es_loading(rp_dat, index = "esadocs", type = "recovery_plan")
 chunked_es_loading(fy_dat, index = "esadocs", type = "five_year_review")

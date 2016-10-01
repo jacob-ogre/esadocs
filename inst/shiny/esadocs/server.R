@@ -9,10 +9,10 @@ shinyServer(function(input, output, session) {
     toggleState(id = "prevButton", condition = rv$current_page > 1)
     toggleState(id = "nextButton", condition = rv$current_page < n_pages())
     hide(selector = ".page")
-    show("hits",
-         anim = TRUE,
-         animType = "fade",
-         time = 0.25)
+    shinyjs::show("hits",
+                  anim = TRUE,
+                  animType = "fade",
+                  time = 0.25)
   })
 
   navPage <- function(direction) {
@@ -44,15 +44,26 @@ shinyServer(function(input, output, session) {
 
   # placeholder function for cleaning input; will probably be extended
   replace_chars <- function(x) {
-    x <- str_replace_all(x,
-                         pattern = "\\{|\\}|;",
-                         replacement = " ")
+    observe({print(x)})
+    # x <- str_replace_all(x,
+    #                      pattern = "\\{|\\}|;",
+    #                      replacement = " ")
+    x <- gsub(x, pattern = '"', replacement = '\\"', fixed = TRUE)
+    observe({print(x)})
     return(x)
   }
 
   # reactive form of input$main_input
   cur_input <- reactive({
     return(replace_chars(input$main_input))
+  })
+
+  cur_type <- reactive({
+    if(input$type_filt == "all") {
+      return("")
+    } else {
+      return(input$type_filt)
+    }
   })
 
   # convert input$date_filt into a Date
@@ -64,43 +75,33 @@ shinyServer(function(input, output, session) {
   # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)
-
-    # # first determine if type, species, date in query
-    # if(type_present(cur_input())) {
-    #   add_type_filter(get_type(cur_input()))
-    # }
-    # if(species_present(cur_input())) {
-    #   add_species_filter(get_type(cur_input()))
-    # }
-    # if(date_present(cur_input())) {
-    #   add_date_filter(get_dates(cur_input()))
-    # }
-
     body <- list(
-      inline = list(
-                 query = list(
-                   match = list(
-                     `{{my_field}}` = "{{my_value}}"
-                    )
-                  ),
-                  size = "{{my_size}}",
-                  highlight = list(
-                    fields = list(
-                      `{{my_field}}` = list(
-                        `fragment_size` = 150,
-                        `pre_tags` = list("<b>"),
-                        `post_tags` = list("</b>")
-                      )
-                    )
+              min_score = 0.05,
+              query = list(
+                match = list(
+                  raw_txt = cur_input()
+                 )
+              ),
+              size = 500,
+              highlight = list(
+                fields = list(
+                  raw_txt = list(
+                    `type` = "fvh",
+                    `fragment_size` = 150,
+                    `pre_tags` = list("<b>"),
+                    `post_tags` = list("</b>")
                   )
-                 ),
-      params = list(my_field = "raw_txt",
-                    my_value = cur_input(),
-                    my_size = 500)
+                )
+              )
     )
-    cur_mats <- Search_template(body = body)$hits$hits
+    fgh <- index_clear_cache("esadocs")
+    cur_mats <- Search("esadocs",
+                       type = cur_type(),
+                       analyzer = "esadocs_analyzer",
+                       body = body)$hits$hits
     if(length(cur_mats) > 0) {
       res_df <- result_asdf(cur_mats)
+      observe({print(dim(res_df))})
       res_df$highlight <- get_highlight(cur_mats)
       res_df <- filter(res_df,
                        is.na(res_df$date) |
@@ -266,24 +267,29 @@ shinyServer(function(input, output, session) {
     } else {
       pages <- generate_hits(cur_res())
       if(length(pages) > 1) {
-        show("prevButton")
-        show("res_txt")
-        show("nextButton")
+        shinyjs::show("prevButton")
+        shinyjs::show("res_txt")
+        shinyjs::show("nextButton")
+      } else {
+        shinyjs::hide("prevButton")
+        shinyjs::hide("res_txt")
+        shinyjs::hide("nextButton")
       }
-      # observe({ print(pages) })
+      if(length(pages) < rv$current_page) rv$current_page <- 1
       return(pages[[rv$current_page]])
     }
   })
 
   output$summary_figs <- renderUI({
     if(test_nulls(cur_res())) {
-      toggle("prevButton")
-      toggle("res_txt")
-      toggle("nextButton")
-      toggle("summ_head")
+      shinyjs::hide("prevButton")
+      shinyjs::hide("res_txt")
+      shinyjs::hide("nextButton")
+      shinyjs::hide("summ_head")
       return(NULL)
     }
-    toggle("summ_head")
+    shinyjs::show("summ_head")
+
     output$score_plot <- renderPlot({
       dat <- data.frame(score = cur_res()$score)
       if(dim(dat)[1] == 0) return(NULL)
@@ -298,6 +304,7 @@ shinyServer(function(input, output, session) {
     })
 
     output$date_plot <- renderPlot({
+      observe({ print(cur_res()$date) })
       dat <- data.frame(date = as.Date(cur_res()$date))
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
