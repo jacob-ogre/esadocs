@@ -117,6 +117,30 @@ add_raw_txt <- function(df) {
   return(df)
 }
 
+#' Add raw text in N-character chunks to df, with df expansion
+#'
+#' We use text extracted from PDFs with \link[pdftext]{pdftext} for full-text
+#' search with Elastic, added in a single field, \code{raw_txt}. The volume of
+#' data in \code{raw_txt} can be rather large; we recommend that it is added
+#'
+#' @param df A data.frame from a \code{bulk_*_prep} function, with txt_path var
+#' @return df, with a raw_txt variable filled using readLines
+#' @importFrom plyr laply
+#' @export
+#' @examples
+#' one or more lines to demo the function
+add_raw_txt_2 <- function(df) {
+  th_char <- function(x) {
+    pieces <- laply(seq(1, nchar(x), 1000),
+                    function(i) substr(x, i, i+999))
+  }
+  raw_txt_all <- unlist(lapply(df$txt_path, load_doc_text))
+  raw_txt <- lapply(raw_txt_all, th_char)
+  # df$raw_txt <- unlist(lapply(df$txt_path, load_doc_text))
+  # return(df)
+  return(raw_txt)
+}
+
 #' Add ESAdocs to Elastic in 100-doc chunks
 #'
 #' The raw text of ESA docs can be rather large; rather than trying to hold

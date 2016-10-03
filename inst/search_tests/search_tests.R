@@ -130,6 +130,8 @@ body <- list(
 Search_template_render(body)
 cur_mats <- Search_template(body = body)$hits$hits
 res <- result_asdf(cur_mats)
+dim(res)
+
 
 body <- list(
           min_score = 0.1,
@@ -158,7 +160,7 @@ body <- list(
           min_score = 0.1,
           query = list(
             match = list(
-              raw_txt = "\\\"recovery unit\\\""
+              raw_txt = "recovery unit"
              )
           ),
           size = 500,
@@ -173,9 +175,31 @@ body <- list(
             )
           )
 )
+
+system.time({
 cur_mats <- Search("esadocs",
                    type = "",
                    analyzer = "esadocs analyzer",
                    body = body)$hits$hits
 res <- result_asdf(cur_mats)
+})
+dim(res)
+
+body <- list(
+          min_score = 0.1,
+          query = list(
+            match = list(
+              raw_txt = "\\\"recovery unit\\\""
+             )
+          ),
+          size = 500
+)
+
+system.time({
+cur_mats <- Search("esadocs",
+                   type = "",
+                   analyzer = "esadocs analyzer",
+                   body = body)$hits$hits
+res <- result_asdf(cur_mats)
+})
 dim(res)
