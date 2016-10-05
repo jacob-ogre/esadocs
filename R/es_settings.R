@@ -20,6 +20,7 @@
 #' @param mappings A vector of one or more document mappings to include
 #' @return  A JSON of elasticsearch settings
 #' @seealso \link{load_es_json}
+#' @export
 #' @examples
 #' analyzer <- load_es_json("data-raw/esadocs_analyzer.json")
 #' fedreg <- load_es_json("data-raw/federal_register_mapping.json")
@@ -57,6 +58,7 @@ make_es_settings <- function(analyzers = c(), mappings = c()) {
 #' @param file Path to the JSON file to be loaded
 #' @return The contents of \code{file} as a list
 #' @seealso \link{make_es_settings}
+#' @export
 #' @examples
 #' load_es_json("data-raw/recovery_plan_mapping")
 load_es_json <- function(file) {

@@ -4,6 +4,12 @@ shinyServer(function(input, output, session) {
 
   rv <- reactiveValues(current_page = 1)
 
+  observeEvent(input$search, {
+    withBusyIndicatorServer("search", {
+      Sys.sleep(1)
+    })
+  })
+
   # observer for incrementing pages
   observe({
     toggleState(id = "prevButton", condition = rv$current_page > 1)
@@ -44,12 +50,7 @@ shinyServer(function(input, output, session) {
 
   # placeholder function for cleaning input; will probably be extended
   replace_chars <- function(x) {
-    observe({print(x)})
-    # x <- str_replace_all(x,
-    #                      pattern = "\\{|\\}|;",
-    #                      replacement = " ")
     x <- gsub(x, pattern = '"', replacement = '\\"', fixed = TRUE)
-    observe({print(x)})
     return(x)
   }
 
@@ -67,8 +68,12 @@ shinyServer(function(input, output, session) {
   })
 
   # convert input$date_filt into a Date
-  date_filter <- reactive({
-    lapply(input$date_filt, as.Date)
+  date_from <- reactive({
+    as.Date(as.numeric(input$date_filt[1]), origin = "1970-01-01")
+  })
+
+  date_to <- reactive({
+    as.Date(as.numeric(input$date_filt[2]), origin = "1970-01-01")
   })
 
   # MAIN SEARCH FUNCTION; note 50-result limit at this time, very simple search
@@ -76,16 +81,16 @@ shinyServer(function(input, output, session) {
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)
     body <- list(
-              min_score = 0.05,
+              min_score = 0.1,
               query = list(
                 match = list(
-                  raw_txt = cur_input()
-                 )
+                  raw_txt.shingles = cur_input()
+                )
               ),
               size = 500,
               highlight = list(
                 fields = list(
-                  raw_txt = list(
+                  raw_txt.shingles = list(
                     `type` = "fvh",
                     `fragment_size` = 150,
                     `pre_tags` = list("<b>"),
@@ -94,20 +99,19 @@ shinyServer(function(input, output, session) {
                 )
               )
     )
-    fgh <- index_clear_cache("esadocs")
+    # fgh <- index_clear_cache("esadocs")
     cur_mats <- Search("esadocs",
                        type = cur_type(),
-                       analyzer = "esadocs_analyzer",
                        body = body)$hits$hits
     if(length(cur_mats) > 0) {
       res_df <- result_asdf(cur_mats)
-      observe({print(dim(res_df))})
       res_df$highlight <- get_highlight(cur_mats)
+      res_df <- distinct(res_df, pdf, .keep_all = TRUE)
       res_df <- filter(res_df,
                        is.na(res_df$date) |
-                       (res_df$date >= date_filter()[1] &
-                        res_df$date <= date_filter()[2]))
-      if(input$type_filt != "all") {
+                       (res_df$date >= date_from() &
+                        res_df$date <= date_to()))
+        if(input$type_filt != "all") {
         res_df <- filter(res_df, res_df$type == input$type_filt)
       }
       if(length(res_df[,1]) > 0) {
@@ -158,7 +162,7 @@ shinyServer(function(input, output, session) {
               column(3,
                 div(class = "info-div",
                     icon("file-text-o"),
-                    str_replace(data$type[i], "_", " "))
+                    str_replace_all(data$type[i], "_", " "))
               ),
               column(3,
                 div(class = "info-div",
@@ -304,7 +308,6 @@ shinyServer(function(input, output, session) {
     })
 
     output$date_plot <- renderPlot({
-      observe({ print(cur_res()$date) })
       dat <- data.frame(date = as.Date(cur_res()$date))
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)

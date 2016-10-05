@@ -14,7 +14,7 @@ library(tools)
 analyzer_json <- load_es_json("inst/extdata/esadocs_analyzer.json")
 fedreg_json <-  load_es_json("inst/extdata/federal_register_mapping.json")
 fiveyr_json <-  load_es_json("inst/extdata/five_year_review_mapping.json")
-recplan_json <- load_es_json("inst/extdata/recovery_plan_mapping.json")
+recplan_json <- esadocs::load_es_json("inst/extdata/recovery_plan_mapping.json")
 s7a2_json <- load_es_json("inst/extdata/consultation_mapping.json")
 
 settings <- make_es_settings(analyzer = c(analyzer_json),
@@ -24,6 +24,7 @@ settings <- make_es_settings(analyzer = c(analyzer_json),
                                recplan_json,
                                s7a2_json
                              ))
+
 connect()
 index_delete("esadocs")
 index_create("esadocs", body = settings)

@@ -45,7 +45,14 @@
         "type": "string",
         "index": "analyzed",
         "term_vector": "with_positions_offsets",
-        "analyzer": "esadocs_analyzer"
+        "analyzer": "esadocs_analyzer",
+        "fields": {
+          "shingles": {
+            "type": "string",
+            "term_vector": "with_positions_offsets",
+            "analyzer": "esadocs_analyzer"
+          }
+        }
       },
       "pdf_md5": {
         "type": "string",

@@ -12,6 +12,7 @@ sidebar <- dashboardSidebar(disable = TRUE)
 body <- dashboardBody(fluidPage(
   div(class = "outer",
     shinyjs::useShinyjs(),
+    tags$style(appCSS),
     tags$head(
       HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400'
            rel='stylesheet' type='text/css'>"),
@@ -154,11 +155,13 @@ body <- dashboardBody(fluidPage(
                           placeholder = "Search ESA documents",
                           width = "100%"),
                 span(class = "input-group-btn",
-                     bsButton(inputId = "search",
-                              label = NULL,
-                              icon = icon("search"),
-                              style = "primary",
-                              size = "default"
+                     withBusyIndicatorUI(
+                       bsButton(inputId = "search",
+                                label = NULL,
+                                icon = icon("search"),
+                                style = "primary",
+                                size = "default"
+                       )
                      )
                 )
             ),
