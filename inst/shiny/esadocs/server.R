@@ -6,7 +6,7 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$search, {
     withBusyIndicatorServer("search", {
-      Sys.sleep(1)
+      Sys.sleep(2.5)
     })
   })
 
