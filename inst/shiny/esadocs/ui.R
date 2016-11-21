@@ -142,8 +142,10 @@ body <- dashboardBody(fluidPage(
     br(),
     fluidRow(
       column(1,
-        img(src = "ESAdocs_search.svg",
-            height = "80px")
+        tags$a(href="http://jwm-dev.org/shiny/esadocs/",
+          img(src = "ESAdocs_search.svg",
+              height = "80px")
+        )
       ),
       column(10,
         fluidRow(
@@ -169,7 +171,10 @@ body <- dashboardBody(fluidPage(
           ),
           column(2,
             div(style = "position: absolute; right:0px",
-                img(src = "DOW_logo_small.png"))
+                tags$a(href="www.defenders.org",
+                  img(src = "DOW_logo_small.png")
+                )
+            )
           )
         ),
         fluidRow(

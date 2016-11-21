@@ -35,7 +35,7 @@ shinyServer(function(input, output, session) {
 
   # the number of indexed documents; could change to an option() later
   output$n_docs <- renderText({
-    tmp <- index_stats("esadocs")$indices$esadocs$total$docs$count
+    tmp <- index_stats("esadocs")$indices$esadocs$primaries$docs$count
     return(paste(tmp, "documents indexed"))
   })
 
