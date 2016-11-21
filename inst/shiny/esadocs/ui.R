@@ -171,7 +171,7 @@ body <- dashboardBody(fluidPage(
           ),
           column(2,
             div(style = "position: absolute; right:0px",
-                tags$a(href="www.defenders.org",
+                tags$a(href="http://www.defenders.org",
                   img(src = "DOW_logo_small.png")
                 )
             )
