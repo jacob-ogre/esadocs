@@ -26,7 +26,9 @@ settings <- make_es_settings(analyzer = c(analyzer_json),
                              ))
 
 connect()
-index_delete("esadocs")
+if(index_exists("esadocs")) {
+  index_delete("esadocs")
+}
 index_create("esadocs", body = settings)
 
 # cleanup
