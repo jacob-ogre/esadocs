@@ -35,8 +35,71 @@ shinyServer(function(input, output, session) {
 
   # the number of indexed documents; could change to an option() later
   output$n_docs <- renderText({
-    tmp <- index_stats("esadocs")$indices$esadocs$primaries$docs$count
+    tmp <- try(index_stats("esadocs")$indices$esadocs$primaries$docs$count,
+               silent = TRUE)
+    if(class(tmp) == "try-error") {
+      cmd <- "/home/jacob/elasticsearch-2.4.0/bin/elasticsearch -d"
+      res <- try(system(cmd, intern = TRUE), silent = TRUE)
+      withProgress(
+        message = "Restarting elasticsearch",
+        detail = "This may take a moment...",
+        value = 0, {
+          for(i in 1:6) {
+            incProgress(1/6)
+            Sys.sleep(1)
+          }
+        }
+      )
+      shinyjs::show("reset_srv")
+      return("The elasticsearch server may be down; please try to restart.")
+    }
     return(paste(tmp, "documents indexed"))
+  })
+
+  observeEvent(input$reset_btn, {
+    cmd <- "/home/jacob/elasticsearch-2.4.0/bin/elasticsearch -d"
+    res <- try(system(cmd, intern = TRUE), silent = TRUE)
+    observe({ print(class(res)) })
+    withProgress(
+      message = "Restarting elasticsearch",
+      detail = "This may take a moment...",
+      value = 0, {
+        for(i in 1:4) {
+          incProgress(1/4)
+          Sys.sleep(1)
+        }
+      }
+    )
+    tmp <- try(index_stats("esadocs")$indices$esadocs$primaries$docs$count,
+               silent = TRUE)
+    if(class(tmp) == "try-error") {
+      withProgress(
+        message = "Elasticsearch starting",
+        detail = "Still trying...",
+        value = 0, {
+          for(i in 1:4) {
+            incProgress(1/4)
+            Sys.sleep(1)
+          }
+        }
+      )
+      tmp <- try(index_stats("esadocs")$indices$esadocs$primaries$docs$count,
+                 silent = TRUE)
+      if(class(tmp) == "try-error") {
+        shinyjs::hide("reset_srv")
+        output$n_docs <- renderText({
+          HTML("<span style='color:red; font-weight:bold'>
+                Please <a href='mailto:esa@defenders.org'>contact us</a>,
+                something is amiss...</span>")
+        })
+      } else {
+        shinyjs::hide("reset_srv")
+        output$n_docs <- renderText(paste(tmp, "documents indexed"))
+      }
+    } else {
+      shinyjs::hide("reset_srv")
+      output$n_docs <- renderText(paste(tmp, "documents indexed"))
+    }
   })
 
   # set the number of results per page
@@ -76,7 +139,7 @@ shinyServer(function(input, output, session) {
     as.Date(as.numeric(input$date_filt[2]), origin = "1970-01-01")
   })
 
-  # MAIN SEARCH FUNCTION; note 50-result limit at this time, very simple search
+  # MAIN SEARCH FUNCTION; note 500-result limit at this time, very simple search
   # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)

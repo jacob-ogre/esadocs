@@ -151,23 +151,39 @@ body <- dashboardBody(fluidPage(
         fluidRow(
           column(1),
           column(9,
-            div(class = "input-group", style = "padding-top:20px",
-                textInput(inputId = "main_input",
-                          label = NULL,
-                          placeholder = "Search ESA documents",
-                          width = "100%"),
-                span(class = "input-group-btn",
-                     withBusyIndicatorUI(
-                       bsButton(inputId = "search",
-                                label = NULL,
-                                icon = icon("search"),
-                                style = "primary",
-                                size = "default"
+            fluidRow(
+              div(class = "input-group", style = "padding-top:20px",
+                  textInput(inputId = "main_input",
+                            label = NULL,
+                            placeholder = "Search ESA documents",
+                            width = "100%"),
+                  span(class = "input-group-btn",
+                       withBusyIndicatorUI(
+                         bsButton(inputId = "search",
+                                  label = NULL,
+                                  icon = icon("search"),
+                                  style = "primary",
+                                  size = "default"
+                         )
                        )
-                     )
-                )
+                  )
+              )
             ),
-            helpText(textOutput("n_docs"), style="font-size:smaller")
+            fluidRow(
+              div(style = "display:inline",
+                shinyjs::hidden(
+                  div(id = "reset_srv",
+                      style = "padding-top:3px;",
+                      bsButton(inputId = "reset_btn",
+                               label = "Reset",
+                               icon = NULL,
+                               style = "danger",
+                               size = "small")
+                  )
+                ),
+                helpText(htmlOutput("n_docs"), style="font-size:smaller")
+              )
+            )
           ),
           column(2,
             div(style = "position: absolute; right:0px",
