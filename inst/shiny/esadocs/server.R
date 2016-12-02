@@ -38,68 +38,11 @@ shinyServer(function(input, output, session) {
     tmp <- try(index_stats("esadocs")$indices$esadocs$primaries$docs$count,
                silent = TRUE)
     if(class(tmp) == "try-error") {
-      cmd <- "/home/jacob/elasticsearch-2.4.0/bin/elasticsearch -d"
-      res <- try(system(cmd, intern = TRUE), silent = TRUE)
-      withProgress(
-        message = "Restarting elasticsearch",
-        detail = "This may take a moment...",
-        value = 0, {
-          for(i in 1:6) {
-            incProgress(1/6)
-            Sys.sleep(1)
-          }
-        }
-      )
-      shinyjs::show("reset_srv")
-      return("The elasticsearch server may be down; please try to restart.")
+      return("<span style='color:red'>The server is down; please wait a few
+             minutes and try again. If the problem persists,
+             <a href='mailto:esa@defenders.org'>contact us</a>.")
     }
     return(paste(tmp, "documents indexed"))
-  })
-
-  observeEvent(input$reset_btn, {
-    cmd <- "/home/jacob/elasticsearch-2.4.0/bin/elasticsearch -d"
-    res <- try(system(cmd, intern = TRUE), silent = TRUE)
-    observe({ print(class(res)) })
-    withProgress(
-      message = "Restarting elasticsearch",
-      detail = "This may take a moment...",
-      value = 0, {
-        for(i in 1:4) {
-          incProgress(1/4)
-          Sys.sleep(1)
-        }
-      }
-    )
-    tmp <- try(index_stats("esadocs")$indices$esadocs$primaries$docs$count,
-               silent = TRUE)
-    if(class(tmp) == "try-error") {
-      withProgress(
-        message = "Elasticsearch starting",
-        detail = "Still trying...",
-        value = 0, {
-          for(i in 1:4) {
-            incProgress(1/4)
-            Sys.sleep(1)
-          }
-        }
-      )
-      tmp <- try(index_stats("esadocs")$indices$esadocs$primaries$docs$count,
-                 silent = TRUE)
-      if(class(tmp) == "try-error") {
-        shinyjs::hide("reset_srv")
-        output$n_docs <- renderText({
-          HTML("<span style='color:red; font-weight:bold'>
-                Please <a href='mailto:esa@defenders.org'>contact us</a>,
-                something is amiss...</span>")
-        })
-      } else {
-        shinyjs::hide("reset_srv")
-        output$n_docs <- renderText(paste(tmp, "documents indexed"))
-      }
-    } else {
-      shinyjs::hide("reset_srv")
-      output$n_docs <- renderText(paste(tmp, "documents indexed"))
-    }
   })
 
   # set the number of results per page

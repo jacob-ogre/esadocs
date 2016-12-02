@@ -3,8 +3,6 @@
 #############################################################################
 # Define the header and sidebar (disabled)
 header <- dashboardHeader(disable = TRUE)
-# header <- dashboardHeader(title = "ESAdocs",
-#                           titleWidth = "10%")
 sidebar <- dashboardSidebar(disable = TRUE)
 
 #############################################################################
@@ -142,7 +140,7 @@ body <- dashboardBody(fluidPage(
     br(),
     fluidRow(
       column(1,
-        tags$a(href="http://jwm-dev.org/shiny/esadocs/",
+        tags$a(href="https://defend-esc-dev.org/shiny/closed/esadocs/",
           img(src = "ESAdocs_search.svg",
               height = "80px")
         )
@@ -170,19 +168,7 @@ body <- dashboardBody(fluidPage(
               )
             ),
             fluidRow(
-              div(style = "display:inline",
-                shinyjs::hidden(
-                  div(id = "reset_srv",
-                      style = "padding-top:3px;",
-                      bsButton(inputId = "reset_btn",
-                               label = "Reset",
-                               icon = NULL,
-                               style = "danger",
-                               size = "small")
-                  )
-                ),
-                helpText(htmlOutput("n_docs"), style="font-size:smaller")
-              )
+              helpText(htmlOutput("n_docs"))
             )
           ),
           column(2,
