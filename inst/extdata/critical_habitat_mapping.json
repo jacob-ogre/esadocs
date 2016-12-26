@@ -1,5 +1,5 @@
 {
-  "section_7a2": {
+  "critical_habitat": {
     "properties": {
       "link": {
         "type": "string",
@@ -13,7 +13,19 @@
         "type": "date",
         "index": "not_analyzed"
       },
+      "fr_citation_page": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
       "title": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "doc_type": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "ch_status": {
         "type": "string",
         "index": "not_analyzed"
       },
@@ -51,14 +63,6 @@
         "index": "not_analyzed"
       },
       "species": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "activity_code": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "federal_agency": {
         "type": "string",
         "index": "not_analyzed"
       },

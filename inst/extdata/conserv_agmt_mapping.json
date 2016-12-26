@@ -1,5 +1,5 @@
 {
-  "section_7a2": {
+  "conserv_agmt": {
     "properties": {
       "link": {
         "type": "string",
@@ -14,10 +14,6 @@
         "index": "not_analyzed"
       },
       "title": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "file_name": {
         "type": "string",
         "index": "not_analyzed"
       },
@@ -46,19 +42,11 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "n_pages": {
+      "pdf_size": {
         "type": "long",
         "index": "not_analyzed"
       },
       "species": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "activity_code": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "federal_agency": {
         "type": "string",
         "index": "not_analyzed"
       },

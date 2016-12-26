@@ -1,10 +1,6 @@
 {
   "federal_register": {
     "properties": {
-      "href": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
       "link": {
         "type": "string",
         "index": "not_analyzed"
@@ -25,11 +21,7 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "pdf": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "txt": {
+      "file_name": {
         "type": "string",
         "index": "not_analyzed"
       },
@@ -58,7 +50,7 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "pdf_size": {
+      "n_pages": {
         "type": "long",
         "index": "not_analyzed"
       },
@@ -66,7 +58,7 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "placenames": {
+      "geo": {
         "type": "string",
         "index": "not_analyzed"
       },

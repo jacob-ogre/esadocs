@@ -1,10 +1,6 @@
 {
   "recovery_plan": {
     "properties": {
-      "href": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
       "link": {
         "type": "string",
         "index": "not_analyzed"
@@ -21,11 +17,15 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "pdf": {
+      "plan_act_status": {
         "type": "string",
         "index": "not_analyzed"
       },
-      "txt": {
+      "plan_status": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "file_path": {
         "type": "string",
         "index": "not_analyzed"
       },
@@ -54,7 +54,7 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "pdf_size": {
+      "n_pages": {
         "type": "long",
         "index": "not_analyzed"
       },
@@ -62,7 +62,7 @@
         "type": "string",
         "index": "not_analyzed"
       },
-      "placenames": {
+      "geo": {
         "type": "string",
         "index": "not_analyzed"
       },
