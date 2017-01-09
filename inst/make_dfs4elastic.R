@@ -288,7 +288,7 @@ consag_files$link <- consag_files$date <- consag_files$title <- NA
 consag_files$raw_txt <- consag_files$species <- ""
 consag_files$geo <- consag_files$tags <- NA
 names(consag_files)
-consag_elast <- consag_files[, c(9,6,8,7,4,1,5,10,2:3,14,13,12,11)]
+consag_elast <- consag_files
 names(consag_elast)
 save(consag_elast, file = "~/Work/Data/esadocs/rda/consag_elast.rda")
 
