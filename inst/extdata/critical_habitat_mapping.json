@@ -2,11 +2,11 @@
   "critical_habitat": {
     "properties": {
       "link": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "type": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "date": {
@@ -14,31 +14,31 @@
         "index": "not_analyzed"
       },
       "fr_citation_page": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "title": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "doc_type": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "ch_status": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "file_name": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "pdf_path": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "txt_path": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "raw_txt": {
@@ -48,14 +48,14 @@
         "analyzer": "esadocs_analyzer",
         "fields": {
           "shingles": {
-            "type": "text",
+            "type": "keyword",
             "term_vector": "with_positions_offsets",
             "analyzer": "esadocs_analyzer"
           }
         }
       },
       "pdf_md5": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "n_pages": {
@@ -63,15 +63,15 @@
         "index": "not_analyzed"
       },
       "species": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "geo": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       },
       "tags": {
-        "type": "text",
+        "type": "keyword",
         "index": "not_analyzed"
       }
     }
