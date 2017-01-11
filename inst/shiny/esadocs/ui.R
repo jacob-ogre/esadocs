@@ -157,11 +157,11 @@ body <- dashboardBody(fluidPage(
                             width = "100%"),
                   span(class = "input-group-btn",
                        withBusyIndicatorUI(
-                         bsButton(inputId = "search",
+                         actionButton(inputId = "search",
                                   label = NULL,
                                   icon = icon("search"),
                                   style = "primary",
-                                  size = "default"
+                                  style="font-size:150%;color:white;background-color:#337ab7;border-color:#2e6da4"
                          )
                        )
                   )
@@ -181,7 +181,7 @@ body <- dashboardBody(fluidPage(
         ),
         fluidRow(
           column(1,
-            bsButton(
+            actionButton(
               inputId = "tog_extras",
               label = NULL,
               icon = icon("filter"),
@@ -190,47 +190,49 @@ body <- dashboardBody(fluidPage(
               value = FALSE
             )
           ),
-          div(id = "extras",
-            column(2,
-              div(class = "slim",
-                selectInput("show_n",
-                            label = NULL,
-                            choices = c("Hits per page (10)", 20, 50, 100),
-                            width = "95%",
-                            multiple = FALSE)
-              )
-            ),
-            column(3,
-              dateRangeInput(
-                "date_filt",
-                label = NULL,
-                start = as.Date("1967-01-01"),
-                end = Sys.Date(),
-                width = "95%"
-              )
-            ),
-            column(2,
-              selectInput(
-                "type_filt",
-                label = NULL,
-                choices = list(
-                  "Document type" = "all",
-                  "Federal Register" = "federal_register",
-                  "Critical Habitat" = "critical_habitat",
-                  "Recovery plan" = "recovery_plan",
-                  "5-year review" = "five_year_review",
-                  "7(a)(1)" = "section_7a1",
-                  "Consultation" = "consultation",
-                  "HCP" = "HCP",
-                  "SHA" = "SHA",
-                  "CCA" = "CCA",
-                  "CCAA" = "CCAA",
-                  "Section 10(a)(1)(A)" = "section_10a1A"
-                ),
-                width = "95%"
-              )
-            ),
-            column(4)
+          hidden(
+            div(id = "extras",
+              column(2,
+                div(class = "slim",
+                  selectInput("show_n",
+                              label = NULL,
+                              choices = c("Hits per page (10)", 20, 50, 100),
+                              width = "95%",
+                              multiple = FALSE)
+                )
+              ),
+              column(3,
+                dateRangeInput(
+                  "date_filt",
+                  label = NULL,
+                  start = as.Date("1967-01-01"),
+                  end = Sys.Date(),
+                  width = "95%"
+                )
+              ),
+              column(2,
+                selectInput(
+                  "type_filt",
+                  label = NULL,
+                  choices = list(
+                    "Document type" = "all",
+                    "Federal Register" = "federal_register",
+                    "Critical Habitat" = "critical_habitat",
+                    "Recovery plan" = "recovery_plan",
+                    "5-year review" = "five_year_review",
+                    "7(a)(1)" = "section_7a1",
+                    "Consultation" = "consultation",
+                    "HCP" = "HCP",
+                    "SHA" = "SHA",
+                    "CCA" = "CCA",
+                    "CCAA" = "CCAA",
+                    "Section 10(a)(1)(A)" = "section_10a1A"
+                  ),
+                  width = "95%"
+                )
+              ),
+              column(4)
+            )
           )
         ),
 
@@ -256,7 +258,7 @@ body <- dashboardBody(fluidPage(
               id = "nextprev",
               style = "width:50%; margin:0 auto;",
               div(style = "display: inline-block",
-                hidden(bsButton("prevButton",
+                hidden(actionButton("prevButton",
                          label = "< Previous",
                          style = "default",
                          size = "small"))
@@ -265,7 +267,7 @@ body <- dashboardBody(fluidPage(
                          "Results pages",
                          style = "font-weight:bold; display:inline-block")),
               div(style = "display: inline-block",
-                hidden(bsButton("nextButton",
+                hidden(actionButton("nextButton",
                          label = "Next >",
                          style = "default",
                          size = "small"))
