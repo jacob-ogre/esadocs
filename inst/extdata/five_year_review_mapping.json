@@ -2,11 +2,11 @@
   "five_year_review": {
     "properties": {
       "link": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "type": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "date": {
@@ -14,36 +14,36 @@
         "index": "not_analyzed"
       },
       "title": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "file_name": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "pdf_path": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "txt_path": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "raw_txt": {
-        "type": "string",
+        "type": "text",
         "index": "analyzed",
         "term_vector": "with_positions_offsets",
         "analyzer": "esadocs_analyzer",
         "fields": {
           "shingles": {
-            "type": "string",
+            "type": "text",
             "term_vector": "with_positions_offsets",
             "analyzer": "esadocs_analyzer"
           }
         }
       },
       "pdf_md5": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "n_pages": {
@@ -51,15 +51,15 @@
         "index": "not_analyzed"
       },
       "species": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "geo": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       },
       "tags": {
-        "type": "string",
+        "type": "text",
         "index": "not_analyzed"
       }
     }
