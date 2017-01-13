@@ -23,32 +23,43 @@ result_asdf <- function(res) {
     title <- get_var(res[[i]]$`_source`, "title")
     date <- get_var(res[[i]]$`_source`, "date")
     file_name <- get_var(res[[i]]$`_source`, "file_name")
-    link <- get_var(res[[i]]$`_source`, "pdf_path")
+    link <- get_var(res[[i]]$`_source`, "link")
+    pdf_path <- get_var(res[[i]]$`_source`, "pdf_path")
     txt_path <- get_var(res[[i]]$`_source`, "txt_path")
-    raw_text <- get_var(res[[i]]$`_source`, "raw_txt")
+    # raw_text <- get_var(res[[i]]$`_source`, "raw_txt")
     pdf_md5 <- get_var(res[[i]]$`_source`, "pdf_md5")
     n_pages <- get_var(res[[i]]$`_source`, "n_pages")
     geo <- get_var(res[[i]]$`_source`, "geo")
     tags <- get_var(res[[i]]$`_source`, "tags")
-    activity_code <-  get_var(res[[i]]$`_source`, "activity_code")
+    fr_citation_page <-  get_var(res[[i]]$`_source`, "fr_citation_page")
+    plan_act_status <-  get_var(res[[i]]$`_source`, "plan_act_status")
+    plan_status <-  get_var(res[[i]]$`_source`, "plan_status")
     federal_agency <- get_var(res[[i]]$`_source`, "federal_agency")
+    activity_code <-  get_var(res[[i]]$`_source`, "activity_code")
+    ch_status <- get_var(res[[i]]$`_source`, "ch_status")
+    doc_type <- get_var(res[[i]]$`_source`, "doc_type")
+    services <- get_var(res[[i]]$`_source`, "services")
     spp_tmp <- paste(res[[i]]$`_source`$species, collapse = "<br>")
     cur_dat <- data.frame(type = type,
                           title = title,
                           date = date,
                           file_name = file_name,
                           link = link,
+                          pdf_path = pdf_path,
                           txt_path = txt_path,
-                          raw_txt = raw_text,
+                          # raw_txt = raw_text,
                           pdf_md5 = pdf_md5,
                           n_pages = n_pages,
+                          fr_citation_page = fr_citation_page,
                           federal_agency = federal_agency,
                           activity_code = activity_code,
+                          ch_status = ch_status,
+                          doc_type = doc_type,
                           species = spp_tmp,
                           geo = geo,
                           tags = tags,
                           stringsAsFactors = FALSE)
-    names(cur_dat)[7] <- "raw_txt"
+    # names(cur_dat)[7] <- "raw_txt"
     res_ls[[i]] <- cur_dat
   }
   res_df <- suppressWarnings(dplyr::bind_rows(res_ls))

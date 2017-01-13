@@ -42,7 +42,7 @@
         "type": "keyword",
         "index": "not_analyzed"
       },
-      "pdf_size": {
+      "n_pages": {
         "type": "long",
         "index": "not_analyzed"
       },
@@ -50,7 +50,7 @@
         "type": "keyword",
         "index": "not_analyzed"
       },
-      "placenames": {
+      "geo": {
         "type": "keyword",
         "index": "not_analyzed"
       },
