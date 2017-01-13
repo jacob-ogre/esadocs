@@ -131,7 +131,7 @@ add_raw_txt <- function(df) {
 #' one or more lines to demo the function
 add_raw_txt_2 <- function(df) {
   th_char <- function(x) {
-    pieces <- laply(seq(1, nchar(x), 1000),
+    pieces <- lapply(seq(1, nchar(x), 1000),
                     function(i) substr(x, i, i+999))
   }
   raw_txt_all <- unlist(lapply(df$txt_path, load_doc_text))

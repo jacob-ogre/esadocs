@@ -6,6 +6,7 @@ library(ecosscraper)
 library(elastic)
 library(esadocs)
 library(jsonlite)
+library(pdftools)
 library(tools)
 
 ###############################################################################
@@ -32,6 +33,9 @@ settings <- make_es_settings(analyzer = c(analyzer_json),
                                policy_json,
                                recplan_json
                              ))
+
+# settings <- make_es_settings(analyzer = c(analyzer_json),
+#                              mappings = c(candid_json))
 
 connect()
 if(index_exists("esadocs")) {
@@ -95,6 +99,22 @@ chunked_es_loading(adddoc_elast, index = "esadocs", type = "federal_register")
 chunked_es_loading(consag_elast, index = "esadocs", type = "conserv_agmt")
 chunked_es_loading(crithab_elast, index = "esadocs", type = "critical_habitat")
 chunked_es_loading(consult_elast, index = "esadocs", type = "consultation")
+
+cons_fils <- list.files("~/Work/Data/esadocs/pdfs/consultation",
+                        full.names = TRUE)
+cons_name <- basename(cons_fils)
+get_text <- function(f) {
+  txt <- paste(pdf_text(f), collapse = "\n")
+  return(txt)
+}
+cons_rawt <- lapply(cons_fils, get_text)
+
+data_fils <- list.files("~/Work/Data/esadocs/rda", full.names = TRUE)
+load(data_fils[4])
+
+cons_subs <- filter(consult_elast, file_name %in% cons_name)
+cons_subs$raw_txt <- cons_rawt
+
 
 # checks
 stats <- index_stats("esadocs")

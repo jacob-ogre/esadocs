@@ -111,8 +111,9 @@ shinyServer(function(input, output, session) {
                        body = body)$hits$hits
     if(length(cur_mats) > 0) {
       res_df <- result_asdf(cur_mats)
+      # observe({ print(names(res_df)) })
       res_df$highlight <- get_highlight(cur_mats)
-      res_df <- distinct(res_df, pdf, .keep_all = TRUE)
+      res_df <- distinct(res_df, file_name, .keep_all = TRUE)
       res_df <- filter(res_df,
                        is.na(res_df$date) |
                        (res_df$date >= date_from() &
@@ -160,7 +161,7 @@ shinyServer(function(input, output, session) {
               span(
                 ifelse(nchar(data$title[i]) > 10 & !is.na(data$title[i]),
                        data$title[i],
-                       "No document title"),
+                       data$file_name[i]),
                 style = "font-size:larger;font-weight:bold"
               )
             ),
