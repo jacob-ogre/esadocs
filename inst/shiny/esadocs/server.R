@@ -151,14 +151,13 @@ shinyServer(function(input, output, session) {
 
   # MAIN HTML GENERATION
   hit_page <- function(i, data, pg) {
-    observe({ print(data) })
     div(id = paste0("pg", pg),
       div(class = "search-res",
         fluidRow(
           column(10,
-            a(href = ifelse(!is.na(data$link[i]),
-                            data$link[i],
-                            data$pdf_path[i]),
+            a(href = ifelse(!is.na(data$pdf_path[i]),
+                            data$pdf_path[i],
+                            data$link[i]),
               target = "_blank",
               span(
                 ifelse(nchar(data$title[i]) > 10 & !is.na(data$title[i]),
@@ -179,12 +178,29 @@ shinyServer(function(input, output, session) {
                     data$date[i])
               ),
               column(3,
+
                 div(class = "info-div",
                     icon("star"),
-                    # paste("Score:", round(0.1234, 3)))
                     paste("Score:", round(data$score[i], 3)))
               ),
-              column(3)
+              column(3,
+                ifelse(is.na(data$link[i]),
+                       tipify(
+                         div(class = "info-div", "No original"),
+                         title = "Original not online",
+                         placement = "bottom"
+                       ),
+                       tipify(
+                         div(class = info-div,
+                           icon("external-link"),
+                           a(href = data$link[i],
+                             target = "_blank",
+                             "Original")),
+                         title = "If still available",
+                         placement = "bottom"
+                       )
+                )
+              )
             ),
             fluidRow(
               column(12,

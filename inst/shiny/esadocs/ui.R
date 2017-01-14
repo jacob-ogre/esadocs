@@ -105,6 +105,12 @@ body <- dashboardBody(fluidPage(
           padding-bottom: 3px;
         }
 
+        .info-div a {
+          color: #009933;
+          padding-top: 3px;
+          padding-bottom: 3px;
+        }
+
         .popover {
           border-radius: 1px;
           width: 350px;
