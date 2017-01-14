@@ -154,6 +154,7 @@ shinyServer(function(input, output, session) {
 
   # MAIN HTML GENERATION
   hit_page <- function(i, data, pg) {
+    observe({ print(data) })
     div(id = paste0("pg", pg),
       div(class = "search-res",
         fluidRow(
@@ -181,6 +182,7 @@ shinyServer(function(input, output, session) {
               column(3,
                 div(class = "info-div",
                     icon("star"),
+                    # paste("Score:", round(0.1234, 3)))
                     paste("Score:", round(data$score[i], 3)))
               ),
               column(3)
