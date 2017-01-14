@@ -142,7 +142,8 @@ consult_elast$pdf_path <- gsub(consult_elast$pdf_path,
 
 names(consult_elast)
 tmp <- left_join(adf, consult_elast, by = c("pdf_url" = "pdf_path"))
-tmp <- select(tmp, -raw_txt.y, -file_name.y, -txt_path.y)
+tmp$pdf_path <- tmp$pdf_url
+tmp <- select(tmp, -raw_txt.y, -file_name.y, -txt_path.y, -pdf_url)
 names(tmp)[1] <- "raw_txt"
 names(tmp)[3] <- "file_name"
 names(tmp)[4] <- "txt_path"

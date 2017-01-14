@@ -111,11 +111,8 @@ shinyServer(function(input, output, session) {
                        body = body)$hits$hits
     if(length(cur_mats) > 0) {
       res_df <- result_asdf(cur_mats)
-      # observe({ print(names(res_df)) })
       res_df$highlight <- get_highlight(cur_mats)
       res_df <- distinct(res_df, file_name, .keep_all = TRUE)
-      observe({ print("I AM HERE!!!") })
-      observe({ print(names(res_df)) })
       res_df <- filter(res_df,
                        is.na(res_df$date) |
                        (res_df$date >= date_from() &
@@ -159,7 +156,9 @@ shinyServer(function(input, output, session) {
       div(class = "search-res",
         fluidRow(
           column(10,
-            a(href = data$link[i],
+            a(href = ifelse(!is.na(data$link[i]),
+                            data$link[i],
+                            data$pdf_path[i]),
               target = "_blank",
               span(
                 ifelse(nchar(data$title[i]) > 10 & !is.na(data$title[i]),
