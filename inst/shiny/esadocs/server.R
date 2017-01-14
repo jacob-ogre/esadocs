@@ -114,6 +114,8 @@ shinyServer(function(input, output, session) {
       # observe({ print(names(res_df)) })
       res_df$highlight <- get_highlight(cur_mats)
       res_df <- distinct(res_df, file_name, .keep_all = TRUE)
+      observe({ print("I AM HERE!!!") })
+      observe({ print(names(res_df)) })
       res_df <- filter(res_df,
                        is.na(res_df$date) |
                        (res_df$date >= date_from() &

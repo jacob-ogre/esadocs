@@ -140,7 +140,7 @@ body <- dashboardBody(fluidPage(
     br(),
     fluidRow(
       column(1,
-        tags$a(href="https://defend-esc-dev.org/shiny/closed/esadocs/",
+        tags$a(href="https://esadocs.cci-dev.org",
           img(src = "ESAdocs_search.svg",
               height = "80px")
         )
@@ -183,8 +183,8 @@ body <- dashboardBody(fluidPage(
           column(1,
             actionButton(
               inputId = "tog_extras",
-              label = NULL,
-              icon = icon("filter"),
+              label = "Filters",
+              # icon = icon("filter"),
               size = "large",
               type = "toggle",
               value = FALSE
@@ -215,18 +215,22 @@ body <- dashboardBody(fluidPage(
                   "type_filt",
                   label = NULL,
                   choices = list(
-                    "Document type" = "all",
-                    "Federal Register" = "federal_register",
-                    "Critical Habitat" = "critical_habitat",
-                    "Recovery plan" = "recovery_plan",
-                    "5-year review" = "five_year_review",
-                    "7(a)(1)" = "section_7a1",
+                    "All document types" = "all",
+                    "Candidates" = "candidate",
+                    "Conserv. Agreements" = "conserv_agmt",
                     "Consultation" = "consultation",
-                    "HCP" = "HCP",
-                    "SHA" = "SHA",
-                    "CCA" = "CCA",
-                    "CCAA" = "CCAA",
-                    "Section 10(a)(1)(A)" = "section_10a1A"
+                    "Critical Habitat" = "critical_habitat",
+                    "Federal Register" = "federal_register",
+                    "Miscellaneous" = "misc",
+                    "Policies" = "policy",
+                    "Recovery Plan" = "recovery_plan",
+                    "5-year review" = "five_year_review",
+                    "7(a)(1)" = "section_7a1"
+                    # "HCP" = "HCP",
+                    # "SHA" = "SHA",
+                    # "CCA" = "CCA",
+                    # "CCAA" = "CCAA",
+                    # "Section 10(a)(1)(A)" = "section_10a1A"
                   ),
                   width = "95%"
                 )

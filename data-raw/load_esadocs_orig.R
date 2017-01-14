@@ -115,6 +115,38 @@ load(data_fils[4])
 cons_subs <- filter(consult_elast, file_name %in% cons_name)
 cons_subs$raw_txt <- cons_rawt
 
+# Now for an on-server test...
+cons_fils <- list.files("~/Data/ESAdocs/consultation", full.names = TRUE)
+cons_name <- basename(cons_fils)
+cons_text <- gsub(cons_fils, pattern = "ESAdocs", replacement = "ESAdocs_text")
+cons_text <- gsub(cons_text, pattern = "pdf$|PDF$", replacement = "txt")
+get_text <- function(f) {
+  txt <- paste(readLines(f), collapse = "\n")
+  return(txt)
+}
+tmp <- lapply(head(cons_text), get_text)
+adf <- data.frame(raw_txt = unlist(tmp),
+                  pdf_path = head(cons_fils),
+                  file_name = head(cons_name),
+                  txt_path =  head(cons_text),
+                  stringsAsFactors = FALSE)
+adf$pdf_url <- gsub(adf$pdf_path,
+                    pattern = "/home/jacobmalcom/Data/",
+                    replacement = "https://esadocs.cci-dev.org/")
+
+data_fils <- list.files("~/Data/ESAdocs/rda", full.names = TRUE)
+load(data_fils[3])
+consult_elast$pdf_path <- gsub(consult_elast$pdf_path,
+                               pattern = "defend-esc-dev",
+                               replacement = "esadocs.cci-dev")
+
+names(consult_elast)
+tmp <- left_join(adf, consult_elast, by = c("pdf_url" = "pdf_path"))
+tmp <- select(tmp, -raw_txt.y, -file_name.y, -txt_path.y)
+names(tmp)[1] <- "raw_txt"
+names(tmp)[3] <- "file_name"
+names(tmp)[4] <- "txt_path"
+res <- docs_bulk(tmp, index = "esadocs", type = "consultation")
 
 # checks
 stats <- index_stats("esadocs")

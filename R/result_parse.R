@@ -64,6 +64,7 @@ result_asdf <- function(res) {
   }
   res_df <- suppressWarnings(dplyr::bind_rows(res_ls))
   res_df$score <- unlist(score_ls)
+  print(res_df)
   return(res_df)
 }
 
