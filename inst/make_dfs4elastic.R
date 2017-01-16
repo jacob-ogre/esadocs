@@ -292,3 +292,24 @@ consag_elast <- consag_files
 names(consag_elast)
 save(consag_elast, file = "~/Work/Data/esadocs/rda/consag_elast.rda")
 
+# Policy documents
+consag_files <- filter(OCR_res, grepl(OCR_res$outfile, pattern = "/conserv_agmt/"))
+names(consult_files)
+consag_files <- select(consag_files, -infile, -error, -proc_time)
+names(consag_files)
+names(consag_files) <- c("pdf_path", "pdf_md5", "n_pages", "file_name")
+consag_files$pdf_path <- gsub(consag_files$pdf_path,
+                              pattern = "/datadrive/data",
+                              replacement = "https://defend-esc-dev.org")
+consag_files$txt_path <- gsub(consag_files$pdf_path,
+                              pattern = "ESAdocs",
+                              replacement = "ESAdocs_text")
+consag_files$type <- "conserv_agmt"
+consag_files$link <- consag_files$date <- consag_files$title <- NA
+consag_files$raw_txt <- consag_files$species <- ""
+consag_files$geo <- consag_files$tags <- NA
+names(consag_files)
+consag_elast <- consag_files
+names(consag_elast)
+save(consag_elast, file = "~/Work/Data/esadocs/rda/consag_elast.rda")
+
