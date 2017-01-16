@@ -273,16 +273,20 @@ save(consult_elast, file = "~/Work/Data/esadocs/rda/consult_elast.rda")
 
 # Conservation agreements
 consag_files <- filter(OCR_res, grepl(OCR_res$outfile, pattern = "/conserv_agmt/"))
-names(consult_files)
+names(consag_files)
 consag_files <- select(consag_files, -infile, -error, -proc_time)
 names(consag_files)
+consag_files$file_name <- basename(consag_files$outfile)
 names(consag_files) <- c("pdf_path", "pdf_md5", "n_pages", "file_name")
 consag_files$pdf_path <- gsub(consag_files$pdf_path,
                               pattern = "/datadrive/data",
-                              replacement = "https://defend-esc-dev.org")
+                              replacement = "/home/jacobmalcom/Data")
 consag_files$txt_path <- gsub(consag_files$pdf_path,
                               pattern = "ESAdocs",
                               replacement = "ESAdocs_text")
+consag_files$txt_path <- gsub(consag_files$txt_path,
+                              pattern = "pdf$|PDF$",
+                              replacement = "txt")
 consag_files$type <- "conserv_agmt"
 consag_files$link <- consag_files$date <- consag_files$title <- NA
 consag_files$raw_txt <- consag_files$species <- ""
@@ -290,26 +294,80 @@ consag_files$geo <- consag_files$tags <- NA
 names(consag_files)
 consag_elast <- consag_files
 names(consag_elast)
-save(consag_elast, file = "~/Work/Data/esadocs/rda/consag_elast.rda")
+save(consag_elast, file = "~/Data/ESAdocs/rda/consag_elast.rda")
 
 # Policy documents
-consag_files <- filter(OCR_res, grepl(OCR_res$outfile, pattern = "/conserv_agmt/"))
-names(consult_files)
-consag_files <- select(consag_files, -infile, -error, -proc_time)
-names(consag_files)
-names(consag_files) <- c("pdf_path", "pdf_md5", "n_pages", "file_name")
-consag_files$pdf_path <- gsub(consag_files$pdf_path,
+policy_files <- filter(OCR_res, grepl(OCR_res$outfile, pattern = "/policy/"))
+names(policy_files)
+policy_files <- select(policy_files, -infile, -error, -proc_time)
+names(policy_files)
+policy_files$file_name <- basename(policy_files$outfile)
+names(policy_files) <- c("pdf_path", "pdf_md5", "n_pages", "file_name")
+policy_files$pdf_path <- gsub(policy_files$pdf_path,
                               pattern = "/datadrive/data",
-                              replacement = "https://defend-esc-dev.org")
-consag_files$txt_path <- gsub(consag_files$pdf_path,
+                              replacement = "/home/jacobmalcom/Data")
+policy_files$txt_path <- gsub(policy_files$pdf_path,
                               pattern = "ESAdocs",
                               replacement = "ESAdocs_text")
-consag_files$type <- "conserv_agmt"
-consag_files$link <- consag_files$date <- consag_files$title <- NA
-consag_files$raw_txt <- consag_files$species <- ""
-consag_files$geo <- consag_files$tags <- NA
-names(consag_files)
-consag_elast <- consag_files
-names(consag_elast)
-save(consag_elast, file = "~/Work/Data/esadocs/rda/consag_elast.rda")
+policy_files$txt_path <- gsub(policy_files$txt_path,
+                              pattern = "pdf$|PDF$",
+                              replacement = "txt")
+policy_files$type <- "policy"
+policy_files$link <- policy_files$date <- policy_files$title <- NA
+policy_files$raw_txt <- policy_files$species <- ""
+policy_files$geo <- policy_files$tags <- NA
+names(policy_files)
+policy_elast <- policy_files
+names(policy_elast)
+save(policy_elast, file = "~/Data/ESAdocs/rda/policy_elast.rda")
+
+# Misc documents
+misc_files <- filter(OCR_res, grepl(OCR_res$outfile, pattern = "/misc/"))
+names(misc_files)
+misc_files <- select(misc_files, -infile, -error, -proc_time)
+names(misc_files)
+misc_files$file_name <- basename(misc_files$outfile)
+names(misc_files) <- c("pdf_path", "pdf_md5", "n_pages", "file_name")
+misc_files$pdf_path <- gsub(misc_files$pdf_path,
+                              pattern = "/datadrive/data",
+                              replacement = "/home/jacobmalcom/Data")
+misc_files$txt_path <- gsub(misc_files$pdf_path,
+                              pattern = "ESAdocs",
+                              replacement = "ESAdocs_text")
+misc_files$txt_path <- gsub(misc_files$txt_path,
+                              pattern = "pdf$|PDF$",
+                              replacement = "txt")
+misc_files$type <- "misc"
+misc_files$link <- misc_files$date <- misc_files$title <- NA
+misc_files$raw_txt <- misc_files$species <- ""
+misc_files$geo <- misc_files$tags <- NA
+names(misc_files)
+misc_elast <- misc_files
+names(misc_elast)
+save(misc_elast, file = "~/Data/ESAdocs/rda/misc_elast.rda")
+
+# Candidate species documents
+candidate_files <- filter(OCR_res, grepl(OCR_res$outfile, pattern = "/candidate/"))
+names(candidate_files)
+candidate_files <- select(candidate_files, -infile, -error, -proc_time)
+names(candidate_files)
+candidate_files$file_name <- basename(candidate_files$outfile)
+names(candidate_files) <- c("pdf_path", "pdf_md5", "n_pages", "file_name")
+candidate_files$pdf_path <- gsub(candidate_files$pdf_path,
+                              pattern = "/datadrive/data",
+                              replacement = "/home/jacobmalcom/Data")
+candidate_files$txt_path <- gsub(candidate_files$pdf_path,
+                              pattern = "ESAdocs",
+                              replacement = "ESAdocs_text")
+candidate_files$txt_path <- gsub(candidate_files$txt_path,
+                              pattern = "pdf$|PDF$",
+                              replacement = "txt")
+candidate_files$type <- "candidate"
+candidate_files$link <- candidate_files$date <- candidate_files$title <- NA
+candidate_files$raw_txt <- candidate_files$species <- ""
+candidate_files$geo <- candidate_files$tags <- NA
+names(candidate_files)
+candidate_elast <- candidate_files
+names(candidate_elast)
+save(candidate_elast, file = "~/Data/ESAdocs/rda/candidate_elast.rda")
 

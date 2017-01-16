@@ -160,9 +160,13 @@ shinyServer(function(input, output, session) {
                             data$link[i]),
               target = "_blank",
               span(
-                ifelse(nchar(data$title[i]) > 10 & !is.na(data$title[i]),
-                       data$title[i],
-                       data$file_name[i]),
+                if(!is.null(data$title[i])) {
+                  ifelse(!is.na(data$title[i]) & nchar(data$title[i]) > 10,
+                         data$title[i],
+                         data$file_name[i])
+                } else {
+                  data$file_name[i]
+                },
                 style = "font-size:larger;font-weight:bold"
               )
             ),
@@ -185,20 +189,12 @@ shinyServer(function(input, output, session) {
               ),
               column(3,
                 ifelse(is.na(data$link[i]),
-                       tipify(
-                         div(class = "info-div", "No original"),
-                         title = "Original not online",
-                         placement = "bottom"
-                       ),
-                       tipify(
-                         div(class = info-div,
-                           icon("external-link"),
-                           a(href = data$link[i],
-                             target = "_blank",
-                             "Original")),
-                         title = "If still available",
-                         placement = "bottom"
-                       )
+                       div(class = "info-div", "No original online"),
+                       div(class = "info-div",
+                         icon("external-link"),
+                         a(href = data$link[i],
+                           target = "_blank",
+                           "Original online"))
                 )
               )
             ),

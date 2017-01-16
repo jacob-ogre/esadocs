@@ -89,6 +89,9 @@ load_to_es <- function(df, index = "esadocs", type) {
                       pattern = "pdf$|PDF$",
                       replacement = "txt")
   sub <- subset_df(df, type)
+  sub$pdf_path <- gsub(sub$pdf_path,
+                       pattern = "/home/jacobmalcom/Data",
+                       replacement = "https://esadocs.cci-dev.org")
   connect()
   brks <- seq(1, dim(sub)[1], 100)
   for(i in 1:length(brks)) {
@@ -109,6 +112,9 @@ load_to_es(consult_elast, "esadocs", "consultation")
 load_to_es(recplan_elast, "esadocs", "recovery_plan")
 load_to_es(crithab_elast, "esadocs", "federal_register")
 load_to_es(fiveyr_elast, "esadocs", "five_year_review")
+load_to_es(policy_elast, "esadocs", "policy")
+load_to_es(misc_elast, "esadocs", "misc")
+load_to_es(candidate_elast, "esadocs", "candidate")
 
 
 
