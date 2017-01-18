@@ -133,7 +133,7 @@ recplan_elast <- select(spp_links, -Species.y, -infile, -outfile)
 recplan_elast$Date <- as.Date(recplan_elast$Date)
 names(recplan_elast)
 names(recplan_elast) <- c("link", "species", "date", "title",
-                          "plan_act_status", "plan_status", "File_Base",
+                          "plan_act_status", "plan_status", "file_name",
                           "pdf_md5", "n_pages", "pdf_path", "txt_path")
 recplan_elast$type <- "recovery_plan"
 recplan_elast$raw_txt <- recplan_elast$geo <- recplan_elast$tags <- ""
