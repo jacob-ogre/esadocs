@@ -442,8 +442,115 @@ crithab_test <- load_miss_es(crithab_miss, "esadocs", "federal_register")
 fiveyr_test <- load_miss_es(fiveyr_miss, "esadocs", "five_year_review")
 misc_test <- load_miss_es(misc_miss, "esadocs", "misc")
 
-consag_readd <- load_miss_es(consag_miss, "esadocs", "conserv_agmt")
-consult_readd <- load_miss_es(consult_miss, "esadocs", "consultation")
-fedreg_miss$pdf_path <- file.path("/home/jacobmalcom/Data/ESAdocs_miss/federal_register",
-                                  fedreg_miss$file_name)
-fedreg_readd <- load_miss_es(fedreg_miss, "esadocs", "federal_register")
+save(adddoc_test, consag_test, consult_test, recplan_test, crithab_test,
+     fiveyr_test, misc_test, file = "~/Data/ESAdocs/missed_files.rda")
+
+#############################################################################
+# Fix PDF paths
+#
+# I messed up a bunch of paths to PDFs when loading elasticsearch, so need to
+# fix them. Plus, ca. 400 missing PDFs were added while in a different directory
+# and need to be moved. Last, this is actually useful for learning how to use
+# the update API, which we will want to use extensively (e.g., tagging, NLP)
+#
+# The first is a test using my local ES with just 8 docs. This works:
+res <- Search("esadocs", stored_fields = "pdf_path", q = "consultation")
+idx <- sapply(1:length(res$hits$hits), function(x) res$hits$hits[[x]]$`_id`)
+
+getted <- docs_mget("esadocs", type = "consultation", ids = idx)
+cur <- sapply(1:length(getted$docs),
+              function(x) getted$docs[[x]]$`_source`$pdf_path)
+new <- gsub(cur, pattern = "defend-esc-dev", replacement = "cci-dev")
+# upd <- docs_update(
+#   index = "esadocs",
+#   type = "consultation",
+#   id = "AVmX25rutEhH8-nPbY4h",
+#   body = list(doc = list(pdf_path = new))
+# )
+
+update_paths <- function(type, id, new_path) {
+  result <- docs_update(
+    index = "esadocs",
+    type = type,
+    id = id,
+    body = list(doc = list(pdf_path = new_path))
+  )
+  return(result$result)
+}
+
+ares <- purrr::pmap(.l = list(type="consultation",
+                              id = idx,
+                              new_path = new),
+                    .f = update_paths)
+
+##############################################################################
+# Now, let's test a query on the remote...
+
+res <- Search("esadocs",
+              type = "misc",
+              stored_fields = "pdf_path",
+              size = 10000,
+              q = "*")
+idx <- sapply(1:length(res$hits$hits), function(x) res$hits$hits[[x]]$`_id`)
+getted <- docs_mget("esadocs", type = "_all", ids = idx)
+cur <- sapply(1:length(getted$docs),
+              function(x) getted$docs[[x]]$`_source`$pdf_path)
+new <- gsub(cur, pattern = "/home/jacobmalcom/Data", replacement = "")
+
+a_res <- purrr::pmap(.l = list(type="misc",
+                               id = idx,
+                               new_path = new),
+                     .f = update_paths)
+
+fix_paths <- function(type) {
+
+  update_paths <- function(type, id, new_path) {
+    result <- docs_update(
+      index = "esadocs",
+      type = type,
+      id = id,
+      body = list(doc = list(pdf_path = new_path))
+    )
+    return(result$result)
+  }
+
+  res <- Search("esadocs",
+                type = type,
+                stored_fields = "pdf_path",
+                size = 10000,
+                q = "*")
+  idx <- sapply(1:length(res$hits$hits), function(x) res$hits$hits[[x]]$`_id`)
+  getted <- docs_mget("esadocs", type = "_all", ids = idx)
+  cur <- sapply(1:length(getted$docs),
+                function(x) getted$docs[[x]]$`_source`$pdf_path)
+  new <- gsub(cur, pattern = "/home/jacobmalcom/Data", replacement = "")
+
+  a_res <- purrr::pmap(.l = list(type = type,
+                                 id = idx,
+                                 new_path = new),
+                       .f = update_paths)
+  return(unlist(a_res))
+}
+
+policy_fix <- fix_paths("policy")
+candidate_fix <- fix_paths("candidate")
+consag_fix <- fix_paths("conserv_agmt")
+table(consag_fix)
+consultation_fix <- fix_paths("consultation")
+fedreg_fix <- fix_paths("federal_register")
+fiveyr_fix <- fix_paths("five_year_review")
+misc_fix <- fix_paths("misc")
+recplan_fix <- fix_paths("recovery_plan")
+
+
+'
+drwxrwxr-x 2 jacobmalcom jacobmalcom   4096 Jan 13 17:15 candidate
+drwxrwxr-x 2 jacobmalcom jacobmalcom  57344 Jan 24 15:02 conserv_agmt
+drwxrwxr-x 2 jacobmalcom jacobmalcom 253952 Jan 24 15:05 consultation
+drwxrwxr-x 2 jacobmalcom jacobmalcom 221184 Jan 24 15:19 federal_register
+drwxrwxr-x 2 jacobmalcom jacobmalcom  36864 Jan 24 15:19 five_year_review
+drwxrwxr-x 2 jacobmalcom jacobmalcom 159744 Jan 24 15:19 misc
+-rw-rw-r-- 1 jacobmalcom jacobmalcom   1279 Jan 24 12:07 missed_files.rda
+drwxrwxr-x 2 jacobmalcom jacobmalcom   4096 Jan 13 18:21 policy
+drwxrwxr-x 2 jacobmalcom jacobmalcom   4096 Jan 18 12:32 rda
+drwxrwxr-x 2 jacobmalcom jacobmalcom  40960 Jan 24 15:20 recovery_plan'
