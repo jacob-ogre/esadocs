@@ -105,12 +105,6 @@ body <- dashboardBody(fluidPage(
           padding-bottom: 3px;
         }
 
-        .info-div a {
-          color: #009933;
-          padding-top: 3px;
-          padding-bottom: 3px;
-        }
-
         .popover {
           border-radius: 1px;
           width: 350px;
@@ -232,16 +226,36 @@ body <- dashboardBody(fluidPage(
                     "Recovery Plan" = "recovery_plan",
                     "5-year review" = "five_year_review",
                     "7(a)(1)" = "section_7a1"
-                    # "HCP" = "HCP",
-                    # "SHA" = "SHA",
-                    # "CCA" = "CCA",
-                    # "CCAA" = "CCAA",
-                    # "Section 10(a)(1)(A)" = "section_10a1A"
                   ),
                   width = "95%"
                 )
               ),
-              column(4)
+              column(2,
+                selectInput(
+                  "min_score",
+                  label = NULL,
+                  choices = list(
+                    "Min score = 0.1" = 0.1,
+                    "Min score = 0.5" = 0.5,
+                    "Min score = 1" = 1,
+                    "Min score = 5" = 5,
+                    "No filter (0)" = 0
+                  ),
+                  width = "95%"
+                )
+              ),
+              column(2,
+                selectInput(
+                  "max_hits",
+                  label = NULL,
+                  choices = list(
+                    "Max hits = 500" = 500,
+                    "Max hits = 100" = 100,
+                    "Max hits = 1000" = 1000,
+                    "Max hits = 10000" = 10000
+                  ),
+                  width = "95%"
+                ))
             )
           )
         ),

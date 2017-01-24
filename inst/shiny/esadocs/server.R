@@ -54,15 +54,24 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  min_score <- reactive({
+    as.numeric(input$min_score)
+  })
+
+  max_hits <- reactive({
+    as.numeric(input$max_hits)
+  })
+
   # placeholder function for cleaning input; will probably be extended
   replace_chars <- function(x) {
-    x <- gsub(x, pattern = '"', replacement = '\\"', fixed = TRUE)
+    x <- gsub(x, pattern = '\'|\"', replacement = '\\"', fixed = TRUE)
     return(x)
   }
 
   # reactive form of input$main_input
   cur_input <- reactive({
-    return(replace_chars(input$main_input))
+    res <- replace_chars(input$main_input)
+    return(res)
   })
 
   cur_type <- reactive({
@@ -86,25 +95,53 @@ shinyServer(function(input, output, session) {
   # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)
-    body <- list(
-              min_score = 0.1,
-              query = list(
-                match = list(
-                  raw_txt.shingles = cur_input()
-                )
-              ),
-              size = 500,
-              highlight = list(
-                fields = list(
-                  raw_txt.shingles = list(
-                    `type` = "fvh",
-                    `fragment_size` = 150,
-                    `pre_tags` = list("<b>"),
-                    `post_tags` = list("</b>")
+    if(grepl(cur_input(), pattern = "^(\"|\')[[:print:]]+(\"|\')$")) {
+      body <- list(
+                min_score = min_score(),
+                `_source` = list(
+                  excludes = "raw_txt"
+                ),
+                query = list(
+                  match_phrase = list(
+                    raw_txt.shingles = cur_input()
+                  )
+                ),
+                size = max_hits(),
+                highlight = list(
+                  fields = list(
+                    raw_txt.shingles = list(
+                      `type` = "fvh",
+                      `fragment_size` = 150,
+                      `pre_tags` = list("<b>"),
+                      `post_tags` = list("</b>")
+                    )
                   )
                 )
-              )
-    )
+      )
+    } else {
+      body <- list(
+                min_score = min_score(),
+                `_source` = list(
+                  excludes = "raw_txt"
+                ),
+                query = list(
+                  match = list(
+                    raw_txt.shingles = cur_input()
+                  )
+                ),
+                size = max_hits(),
+                highlight = list(
+                  fields = list(
+                    raw_txt.shingles = list(
+                      `type` = "fvh",
+                      `fragment_size` = 150,
+                      `pre_tags` = list("<b>"),
+                      `post_tags` = list("</b>")
+                    )
+                  )
+                )
+      )
+    }
     # fgh <- index_clear_cache("esadocs")
     cur_mats <- Search("esadocs",
                        type = cur_type(),
@@ -182,19 +219,20 @@ shinyServer(function(input, output, session) {
                     data$date[i])
               ),
               column(3,
-
                 div(class = "info-div",
                     icon("star"),
                     paste("Score:", round(data$score[i], 3)))
               ),
               column(3,
-                ifelse(is.na(data$link[i]),
-                       div(class = "info-div", "No original online"),
-                       div(class = "info-div",
-                         icon("external-link"),
+                div(class = "info-div",
+                  if(is.na(data$link[i])) {
+                    "No original online"
+                  } else {
+                    span(icon("external-link"),
                          a(href = data$link[i],
-                           target = "_blank",
-                           "Original online"))
+                         target = "_blank",
+                         "Original online"))
+                  }
                 )
               )
             ),

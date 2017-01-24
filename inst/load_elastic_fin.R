@@ -72,13 +72,6 @@ subset_df <- function(df, type) {
   return(subd)
 }
 
-missing_df <- function(df, type) {
-  cur_path <- file.path("/home/jacobmalcom/Data/ESAdocs", type)
-  type_fils <- list.files(cur_path)
-  subd <- dplyr::filter(df, !(file_name %in% type_fils))
-  return(subd)
-}
-
 load_to_es <- function(df, index = "esadocs", type) {
   df$pdf_path <- gsub(df$pdf_path,
                       pattern = "https://defend-esc-dev.org",
@@ -120,6 +113,14 @@ load_to_es(candidate_elast, "esadocs", "candidate")       # 96    # 96
 ###############################################################################
 # OK, now I need to ID the files that were missed, send that over to Azure,
 # find the files, send them back here, check for text | OCR, and load. Whew.
+
+missing_df <- function(df, type) {
+  cur_path <- file.path("/home/jacobmalcom/Data/ESAdocs", type)
+  type_fils <- list.files(cur_path)
+  subd <- dplyr::filter(df, !(file_name %in% type_fils))
+  return(subd)
+}
+
 consag_miss <- missing_df(consag_elast, "conserv_agmt")
 adddoc_miss <- missing_df(adddoc_elast, "federal_register")
 fedreg_miss <- missing_df(fedreg_elast, "federal_register")
@@ -204,12 +205,45 @@ all_fils <- c(adddoc_here$path,
               recplan_here$path)
 all_fils <- unique(all_fils)
 
+save(adddoc_here,
+     consag_here,
+     consult_here,
+     crithab_here,
+     fedreg_here,
+     fiveyr_here,
+     misc_here,
+     recplan_here, file = "/datadrive/data/ESAdocs_miss/fils_here.rda")
+
+load("/datadrive/data/ESAdocs_miss/fils_here.rda")
+
 wrap_ocrmypdf <- function(infil, outdir) {
   base_dir <- dirname(infil)
   base_fil <- basename(infil)
+  encrypt <- try(pdf_info(infil)$encrypted, silent = TRUE)
+  if(class(encrypt) != "try-error") {
+    if(encrypt) {
+      res <- try_pdftk_cast(infil)
+      if(res == 0) {
+        infil <- file.path("/datadrive/data/ESAdocs_miss/temp_encr", base_fil)
+        base_dir <- dirname(infil)
+        base_fil <- basename(infil)
+      } else {
+        res <- try_ppm_cast(infil)
+        if(grepl(res, pattern = "Error")) {
+          return(paste("Encrypted:", infil))
+        } else {
+          infil <- res$infil
+          base_dir <- res$base_dir
+          base_fil <- res$base_fil
+        }
+      }
+    }
+  } else {
+    return(paste("Not a pdf:", infil))
+  }
   nospace <- gsub(x = base_fil, pattern = " ", replacement = "_")
   nospace <- gsub(x = nospace, pattern = "&", replacement = "and")
-  nospace <- gsub(x = nospace, pattern = "\\(|\\)", replacement = "")
+  nospace <- gsub(x = nospace, pattern = "\\(|\\)|\'|\"", replacement = "")
   nospace <- gsub(x = nospace, pattern = "\\,", replacement = "")
   nospace <- file.path(base_dir, nospace)
   file.rename(infil, nospace)
@@ -217,30 +251,87 @@ wrap_ocrmypdf <- function(infil, outdir) {
   cmd <- paste0("ocrmypdf ",
                 "--deskew ",
                 "--rotate-pages --rotate-pages-threshold 10 ",
-                "--oversample 500 ",
+                "--oversample 300 ",
                 "--skip-text ",
                 "-l eng --tesseract-config ~/asciimostly '",
                 nospace,
                 "' ",
                 outf)
-  print(paste("Checking", nospace))
-  embedded <- try(check_embed(nospace))
+  embedded <- try(check_embed(nospace), silent = TRUE)
   if(class(embedded) != "try-error") {
     if(embedded) {
-      # print(sprintf("\n\tCopying %s; writing to %s...\n", nospace, outf))
       file.copy(nospace, outf)
+      return("File copied")
     } else {
       if(!file.exists(outf)) {
-        # print(sprintf("\n\tProcessing %s; writing to %s...\n", nospace, outf))
         res <- try(system(command = cmd, intern = FALSE, wait = TRUE))
-        if(res[1] == "try-error") {
-          message(paste("\n\tSomething went wrong:\n\n", res))
-          message(paste("\n\tFile:\t", nospace))
+        if(res == 15 | res == 8) {
+          res <- try_ppm_cast(nospace)
+          if(grepl(res, pattern = "Error")) {
+            return(res)
+          } else {
+            nospace <- res$infil
+            cmd <- paste0("ocrmypdf ",
+                          "--deskew ",
+                          "--rotate-pages --rotate-pages-threshold 10 ",
+                          "--oversample 300 ",
+                          "--skip-text ",
+                          "-l eng --tesseract-config ~/asciimostly '",
+                          nospace,
+                          "' ",
+                          outf)
+            res <- try(system(command = cmd, intern = FALSE, wait = TRUE))
+            if(res == 0) {
+              return(paste("OCR'd, maybe:", outf))
+            }
+            return(paste("OCR error:", res))
+          }
+          return(paste("OCR error:", res))
         }
+        return(paste("OCR'd, maybe:", outf))
       }
+      return("File exists")
     }
   } else {
-    print(paste("Error with file text embed check:", nospace))
+    return(paste("Text embed error:", infil))
+  }
+}
+
+try_pdftk_cast <- function(infil) {
+  base_dir <- dirname(infil)
+  base_fil <- basename(infil)
+  tmp_fil <- file.path("/datadrive/data/ESAdocs_miss/temp_encr", base_fil)
+  cmd <- paste("pdftk",
+               infil,
+               "cat output",
+               tmp_fil)
+  res <- try(system(cmd, intern = FALSE, wait = TRUE))
+  return(res)
+}
+
+try_ppm_cast <- function(infil) {
+  base_fil <- basename(infil)
+  ppmf <- file.path("/datadrive/data/ESAdocs_miss/temp_encr",
+                    paste0(base_fil, ".png"))
+  cmd <- paste("pdftoppm -r 300 -png", infil, ">", ppmf)
+  res <- try(system(cmd, intern = FALSE, wait = TRUE))
+  if(res == 0) {
+    pdff <- paste0(ppmf, ".pdf")
+    cmd <- paste("convert", ppmf, pdff)
+    res <- try(system(cmd, intern = FALSE, wait = TRUE))
+    if(res == 0) {
+      infil <- pdff
+      base_dir <- dirname(pdff)
+      base_fil <- basename(pdff)
+      unlink(ppmf)
+      return(list(infil = infil,
+                  base_dir = base_dir,
+                  base_fil = base_fil))
+    } else {
+      return(paste("Error @convert:", infil))
+    }
+  } else {
+    return(paste("Error @pdftoppm:", infil))
   }
 }
 
@@ -248,41 +339,9 @@ check_embed <- function(file) {
   text <- pdftools::pdf_text(file)
   nchr <- unlist(lapply(text, nchar))
   if(mean(nchr, na.rm = TRUE) > 100) {
-    temp <- pdftools::pdf_info(file)
-    if (length(temp) > 1) {
-      info <- list(temp)
-    }
-    else {
-      info <- temp
-    }
-    if (!is.atomic(info[[1]][1]) & !is.na(info[[1]][1])) {
-      if (!is.null(info[[1]]$keys)) {
-        if (!is.null(info[[1]]$keys$Producer)) {
-          if (grepl(info[[1]]$keys$Producer, pattern = "Distiller|Word|Library|Ghost|Acrobat Pro|Adobe Acrobat")) {
-            return(TRUE)
-          }
-        }
-      }
-    }
-    return(FALSE)
+    return(TRUE)
   }
   return(FALSE)
-}
-
-run_wrapper <- function(search_dir, write_dir) {
-  cur_files <- list.files(search_dir,
-                          pattern = "*.pdf",
-                          ignore.case = TRUE,
-                          recursive = TRUE,
-                          full.names = TRUE)
-  if(!dir.exists(write_dir)) {
-    dir.create(write_dir, recursive = TRUE)
-  }
-  cur_res <- parallel::mclapply(X = cur_files,
-                                FUN = wrap_ocrmypdf,
-                                outdir = write_dir,
-                                mc.preschedule = FALSE,
-                                mc.cores = 14)
 }
 
 ocr_wrap <- function(fs, write_dir) {
@@ -293,72 +352,98 @@ ocr_wrap <- function(fs, write_dir) {
                                 FUN = wrap_ocrmypdf,
                                 outdir = write_dir,
                                 mc.preschedule = FALSE,
-                                mc.cores = 14)
+                                mc.cores = 13)
 }
 
 adddoc_ocr <- ocr_wrap(adddoc_here$path,
-                       "/datadrive/data/ESAdocs_missed/federal_register")
+                       "/datadrive/data/ESAdocs_miss/federal_register")
 fedreg_ocr <- ocr_wrap(fedreg_here$path,
-                       "/datadrive/data/ESAdocs_missed/federal_register")
+                       "/datadrive/data/ESAdocs_miss/federal_register")
 crithab_ocr <- ocr_wrap(crithab_here$path,
-                       "/datadrive/data/ESAdocs_missed/federal_register")
+                       "/datadrive/data/ESAdocs_miss/federal_register")
 consult_ocr <- ocr_wrap(consult_here$path,
-                       "/datadrive/data/ESAdocs_missed/consultation")
+                       "/datadrive/data/ESAdocs_miss/consultation")
 consag_ocr <- ocr_wrap(consag_here$path,
-                       "/datadrive/data/ESAdocs_missed/conserv_agmt")
+                       "/datadrive/data/ESAdocs_miss/conserv_agmt")
 recplan_ocr <- ocr_wrap(recplan_here$path,
-                       "/datadrive/data/ESAdocs_missed/recovery_plan")
+                       "/datadrive/data/ESAdocs_miss/recovery_plan")
 misc_ocr <- ocr_wrap(misc_here$path,
-                       "/datadrive/data/ESAdocs_missed/misc")
+                     "/datadrive/data/ESAdocs_miss/misc")
 fiveyr_ocr <- ocr_wrap(fiveyr_here$path,
-                       "/datadrive/data/ESAdocs_missed/five_year_review")
+                       "/datadrive/data/ESAdocs_miss/five_year_review")
 
-rsync_away <- function(f, d) {
-  esc_f <- gsub(f, pattern = " ", replacement = "\\ ", fixed = TRUE)
-  esc_f <- gsub(esc_f, pattern = "'", replacement = "\\'", fixed = TRUE)
-  cmd <- paste("rsync -vc",
-               esc_f,
-               paste0("jacobmalcom@35.185.10.154:",
-                      "/home/jacobmalcom/Data/ESAdocs_miss/",
-                      d))
-  system(cmd)
-}
-
-res <- lapply(adddoc_here$path, rsync_away, d = "federal_register")
-length(res[res > 0])
-res <- lapply(consag_here$path, rsync_away, d = "conserv_agmt")
-length(res[res > 0])
-res <- lapply(consult_here$path, rsync_away, d = "consultation")
-length(res[res > 0])
-res <- lapply(crithab_here$path, rsync_away, d = "federal_register")
-length(res[res > 0])
-res <- lapply(fedreg_here$path, rsync_away, d = "federal_register")
-length(res[res > 0])
-res <- lapply(fiveyr_here$path, rsync_away, d = "five_year_review")
-length(res[res > 0])
-res <- lapply(misc_here$path, rsync_away, d = "misc")
-length(res[res > 0])
-res <- lapply(recplan_here$path, rsync_away, d = "recovery_plan")
-length(res[res > 0])
-
+# Use `scp` to copy the files over to GCE
 ###############################################################################
 
 ###############################################################################
 # Now, back over to GCE
-fils_list <- list.files("~/Data/ESAdocs_miss",
-                        full.names = TRUE,
-                        recursive = TRUE)
 
-# check_text <- function(x) {
-#   txt <- pdf_text(x)
-#   nch <- unlist(lapply(txt, nchar))
-#   print(mean(nch), na.rm = TRUE)
-#   print(length(nch))
-#   if(mean(nch, na.rm = TRUE) > 100) return(TRUE)
-#   return(FALSE)
-# }
-#
-# with_text <- unlist(lapply(fils_list[1:5], check_text))
-# Bunch of files without a text layer, so need to grab the OCRmyPDF code...
+get_txt <- function(df, type) {
+  temp_pdf <- file.path("/home/jacobmalcom/Data/ESAdocs_miss",
+                        type,
+                        df$file_name)
+  temp_pdf <- gsub(x = temp_pdf, pattern = " ", replacement = "_")
+  temp_pdf <- gsub(x = temp_pdf, pattern = "&", replacement = "and")
+  temp_pdf <- gsub(x = temp_pdf, pattern = "\\(|\\)|\'|\"", replacement = "")
+  temp_pdf <- gsub(x = temp_pdf, pattern = "\\,", replacement = "")
+  read_txt <- function(f) {
+    if(!file.exists(f)) {
+      alt_f <- paste0(f, ".png.pdf")
+      if(!file.exists(alt_f)) {
+        warning(paste(f, "or", alt_f, "does not exist..."))
+        return("")
+      } else {
+        f <- alt_f
+      }
+    }
+    res <- try(paste(pdftools::pdf_text(f), collapse = "\n"))
+    if(class(res) == "try-error") {
+      warning(res)
+      return("")
+    }
+    return(res)
+  }
+  texts <- lapply(temp_pdf, read_txt)
+  missing_pdfs <- temp_pdf[!file.exists(temp_pdf) &
+                             !file.exists(paste0(temp_pdf, ".png.pdf"))]
+  df$raw_txt <- unlist(texts)
+  df$pdf_path_2 <- temp_pdf
+  return(list(df = df, missing_pdfs = missing_pdfs))
+}
 
-ocr_res_17Jan <- run_wrapper("~/Data/ESAdocs_miss", "~/Data/ESAdocs_miss_OCR")
+load_miss_es <- function(df, index = "esadocs", type) {
+  sub <- df
+  connect()
+  brks <- seq(1, dim(sub)[1], 100)
+  missing_pdfs <- c()
+  for(i in 1:length(brks)) {
+    st <- brks[i]
+    en <- ifelse(brks[i] + 99 < dim(sub)[1],
+                 brks[i] + 99,
+                 dim(sub)[1])
+    result <- get_txt(sub[st:en, ], type)
+    cur_tst <- result$df
+    missing_pdfs <- c(missing_pdfs, result$missing_pdfs)
+    src_path <- cur_tst$pdf_path_2
+    cur_tst$pdf_path <- file.path("/home/jacobmalcom/Data/ESAdocs",
+                                  type,
+                                  cur_tst$file_name)
+    bulk <- docs_bulk(cur_tst, index = index, type = type)
+    message(sprintf("Added records %s to %s\n", st, en))
+  }
+  return(missing_pdfs)
+}
+
+adddoc_test <- load_miss_es(adddoc_miss, "esadocs", "federal_register")
+consag_test <- load_miss_es(consag_miss, "esadocs", "conserv_agmt")
+consult_test <- load_miss_es(consult_miss, "esadocs", "consultation")
+recplan_test <- load_miss_es(recplan_miss, "esadocs", "recovery_plan")
+crithab_test <- load_miss_es(crithab_miss, "esadocs", "federal_register")
+fiveyr_test <- load_miss_es(fiveyr_miss, "esadocs", "five_year_review")
+misc_test <- load_miss_es(misc_miss, "esadocs", "misc")
+
+consag_readd <- load_miss_es(consag_miss, "esadocs", "conserv_agmt")
+consult_readd <- load_miss_es(consult_miss, "esadocs", "consultation")
+fedreg_miss$pdf_path <- file.path("/home/jacobmalcom/Data/ESAdocs_miss/federal_register",
+                                  fedreg_miss$file_name)
+fedreg_readd <- load_miss_es(fedreg_miss, "esadocs", "federal_register")
