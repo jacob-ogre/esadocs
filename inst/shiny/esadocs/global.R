@@ -2,7 +2,7 @@
 
 library(dplyr)
 library(elastic)
-library(esadocs)
+# library(esadocs)
 library(ggplot2)
 library(ggthemes)
 library(shiny)

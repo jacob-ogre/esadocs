@@ -18,7 +18,7 @@
 result_asdf <- function(res) {
   score_ls <- vector("list", length(res))
   res_ls <- vector("list", length(res))
-  # print(names(res[[1]]$`_source`))
+  print(names(res[[1]]))
   for(i in 1:length(res)) {     # NOTE: lapply doesn't work for some reason
     score_ls[[i]] <- res[[i]]$`_score`
     type <- get_var(res[[i]]$`_source`, "type")
