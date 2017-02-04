@@ -506,6 +506,7 @@ shinyServer(function(input, output, session) {
       h4("No matches; please enter another search.")
     } else {
       pages <- generate_hits(cur_res())
+      output$foot_spacer <- renderUI({HTML("<br>")})
       if(length(pages) > 1) {
         shinyjs::show("prevButton")
         shinyjs::show("res_txt")
@@ -665,12 +666,8 @@ shinyServer(function(input, output, session) {
   }
 
   output$foot_spacer <- renderUI({
-    if(identical(cur_input(), "") || test_nulls(cur_res())) {
-      return(HTML("<br><br><br><br><br><br><br><br><br><br><br><br><br>
-                  <br><br><br><br><br><br><br><br><br><br><br><br><br><br>"))
-    } else {
-      return(HTML("<p>NADA</p>"))
-    }
+    HTML("<br><br><br><br><br><br><br><br><br><br><br><br><br>
+         <br><br><br><br><br><br>")
   })
 
 })
