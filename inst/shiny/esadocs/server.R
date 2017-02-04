@@ -100,6 +100,56 @@ test_nulls <- function(x) {
 
 shinyServer(function(input, output, session) {
 
+  observeEvent(input$help, {
+    showModal(
+      modalDialog(
+        title = "Help",
+        h3("Getting started"),
+        div(style="font-size:larger",
+          p("ESAdocs Search makes it easy to find documents related to the
+            U.S. Endangered Species Act (ESA). To get started:"),
+          tags$ol("1. Enter your search term"),
+          tags$ol("2. Press the magnifier to search"),
+          HTML("<img src='new_img.png' width='100%'>"),
+          p("Notice that the search can be refined with the Filter (red arrow)"),
+          hr(),
+          p(strong("Note:"), "Searches may take several seconds depending on
+            the specifics of the terms you are looking for or the max number of
+            results you allow."),
+          hr(),
+          h4("Filters"),
+          p("Filters can be applied to broaden or narrow the search results.
+            Currently, filters include:"),
+          tags$ol("1. How many results to show per page"),
+          tags$ol("2. A date range to restrict results"),
+          tags$ol("3. The type of documents to search"),
+          tags$ol("4. The minimum search score to include"),
+          tags$ol("5. The maximum number of hits to include"),
+          HTML("<img src='new_filter_img.png' width='100%'>"),
+          p("The more lenient the filters, the longer a search will take."),
+          hr(),
+          h4("Results"),
+          p("The results are pretty simple:"),
+          tags$ol("1. Each document includes a link to the PDF, a text snippet,
+                  and additional metadata"),
+          tags$ol("2. The 'green line' includes the document type, date, score
+                  given the search, and a link to the original version (if
+                  available)"),
+          tags$ol("3. The 'blue line' includes extracted pieces of data,
+                  including species, places, gov't agencies, tags, and (in gray)
+                  the internal document ID."),
+          tags$ol("4. Several summaries across all hits are calculated in the
+                  supplemental results sidebar. The exact contents will evolve
+                  as the app is used."),
+          HTML("<img src='searched_img.png' width='100%'>"),
+          p("We note that the details of search results may change.")
+        ),
+        size = "l",
+        easyClose = TRUE
+      )
+    )
+  })
+
   rv <- reactiveValues(current_page = 1)
 
   observeEvent(input$search, {
@@ -488,17 +538,13 @@ shinyServer(function(input, output, session) {
 
     observe(print(table(cur_res()$type)))
 
-    output$score_plot <- renderPlot({
-      dat <- data.frame(score = cur_res()$score)
-      if(dim(dat)[1] == 0) return(NULL)
-      nbin <- floor(dim(dat)[1] / 3)
-      if(nbin < 1) nbin <- 1
-      p <- ggplot(data = dat, aes(score)) +
-             geom_histogram(bins = nbin) +
-             labs(x = "Search score",
-                  y = "# documents") +
-             theme_hc()
-      return(p)
+    output$doc_types <- DT::renderDataTable({
+      doc_tab <- sort(table(cur_res()$type), decreasing = TRUE)
+      types <- gsub(names(doc_tab), pattern = "_", replacement = " ")
+      doc_df <- data.frame(type = types,
+                           count = as.vector(doc_tab),
+                           stringsAsFactors = FALSE)
+      return(doc_df)
     })
 
     output$pages_plot <- renderPlot({
@@ -506,6 +552,7 @@ shinyServer(function(input, output, session) {
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
+      if(nbin > 30) nbin <- 30
       p <- ggplot(data = dat, aes(score)) +
              geom_histogram(bins = nbin) +
              labs(x = "# pages",
@@ -517,11 +564,12 @@ shinyServer(function(input, output, session) {
     output$date_plot <- renderPlot({
       dat <- data.frame(date = as.Date(cur_res()$date))
       output$n_na_date <- renderText({
-        paste("# NA:", sum(is.na(dat$date)) )
+        paste("# docs without a date:", sum(is.na(dat$date)) )
       })
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
+      if(nbin > 30) nbin <- 30
       p <- ggplot(data = dat, aes(date)) +
              geom_histogram(bins = nbin) +
              labs(x = "Document date",
@@ -530,49 +578,44 @@ shinyServer(function(input, output, session) {
       return(p)
     })
 
-    output$top_spp <- renderPlot({
-    spp_list <- str_split(
-      paste(cur_res()$species, collapse = "<br>"),
-      "<br>")
-    spp_tab <- sort(table(spp_list), decreasing = TRUE)[1:10]
-    spp_df <- data.frame(species = names(spp_tab),
-                         count = as.vector(spp_tab),
-                         stringsAsFactors = FALSE)
-    p <- ggplot(spp_df, aes(x = species, y = count)) +
-      geom_bar(stat = "identity") +
-      coord_flip() +
-      labs(x = "",
-           y = "# documents",
-           subtitle = "Top 10 species") +
-      theme_hc()
-    return(p)
-    })
-
     output$spp_table <- DT::renderDataTable({
       spp_list <- str_split(paste(cur_res()$species, collapse = "<br>"), "<br>")
       spp_tab <- sort(table(spp_list), decreasing = TRUE)
-      spp_df <- data.frame(species = names(spp_tab),
+      spp_df <- data.frame(taxon = names(spp_tab),
                            count = as.vector(spp_tab),
                            stringsAsFactors = FALSE)
       return(spp_df)
     })
 
-    output$doc_types <- DT::renderDataTable({
-      doc_tab <- sort(table(cur_res()$type), decreasing = TRUE)
-      doc_df <- data.frame(type = names(doc_tab),
-                           count = as.vector(doc_tab),
-                           stringsAsFactors = FALSE)
-      return(doc_df)
+    output$score_plot <- renderPlot({
+      dat <- data.frame(score = cur_res()$score)
+      if(dim(dat)[1] == 0) return(NULL)
+      nbin <- floor(dim(dat)[1] / 3)
+      if(nbin < 1) nbin <- 1
+      if(nbin > 30) nbin <- 30
+      p <- ggplot(data = dat, aes(score)) +
+             geom_histogram(bins = nbin) +
+             labs(x = "Search score",
+                  y = "# documents") +
+             theme_hc()
+      return(p)
     })
 
-    tabBox(
+    tabsetPanel(
+      tabPanel(
+        title = "Type",
+        br(),
+        p(style="font-size:larger", "Types of documents"),
+        hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
+        DT::dataTableOutput("doc_types", height = "250px")
+      ),
       tabPanel(
         title = "Date",
         br(),
         p(style="font-size:larger", "Document dates"),
         hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
         plotOutput("date_plot", height = "350px"),
-        helpText(textOutput("n_na_date"))
+        div(style="text-align:right", helpText(textOutput("n_na_date")))
       ),
       tabPanel(
         title = "Species",
@@ -582,11 +625,11 @@ shinyServer(function(input, output, session) {
         DT::dataTableOutput("spp_table", height = "250px")
       ),
       tabPanel(
-        title = "Type",
+        title = "Pages",
         br(),
-        p(style="font-size:larger", "Types of documents"),
+        p(style="font-size:larger", "# pages per document"),
         hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
-        DT::dataTableOutput("doc_types", height = "250px")
+        plotOutput("pages_plot", height = "350px")
       ),
       tabPanel(
         title = "Score",
@@ -595,8 +638,9 @@ shinyServer(function(input, output, session) {
         hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
         plotOutput("score_plot", height = "350px")
       ),
-      width = 12,
-      height = "200px"
+      type = "pills"
+      # width = 12,
+      # height = "200px"
     )
   })
 

@@ -8,6 +8,7 @@ sidebar <- dashboardSidebar(disable = TRUE)
 #############################################################################
 # Define the page(s) with dashboardBody
 body <- dashboardBody(fluidPage(
+  # theme = shinythemes::shinytheme("yeti"),
   div(class = "outer",
     shinyjs::useShinyjs(),
     tags$style(appCSS),
@@ -132,16 +133,20 @@ body <- dashboardBody(fluidPage(
           border-radius: 1px;
         }
 
+        .nav-pills>li.active>a,
+        .nav-pills>li.active>a:focus,
+        .nav-pills>li.active>a:hover {
+          border-radius: 2px;
+        }
+
+        .nav>li>a:focus, .nav>li>a:hover {
+          border-radius: 2px;
+        }
+
+        .nav-pills>li>a { border-radius: 1px }
 
         ")
       )
-    ),
-
-    bsModal(id = "a_modal",
-            title = "Title",
-            trigger = "contrib",
-            p("Text..."),
-            size = "large"
     ),
 
     br(),
@@ -283,14 +288,14 @@ body <- dashboardBody(fluidPage(
             hidden(uiOutput("hits"))
           ),
           column(4,
-            fluidRow(
-              column(12,
+            # fluidRow(
+              # column(12,
                 br(),
-                hidden(h4(id = "summ_head", "Supplemental results")),
+                # hidden(h4(id = "summ_head", "Supplemental results")),
                 br(),
                 uiOutput("summary_figs", height = "200px")
-              )
-            )
+              # )
+            # )
           )
         ),
         fluidRow(
@@ -321,7 +326,13 @@ body <- dashboardBody(fluidPage(
           br()
         )
       ),
-      column(1)
+      column(1,
+        actionButton(
+          inputId = "help",
+          label = "Help",
+          icon = icon("question")
+        )
+      )
     )
   )
 ))
