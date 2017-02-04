@@ -69,9 +69,7 @@ get_highlight <- function(res) {
   # at least not without getting way more complicated than using a for loop
   for(i in 1:length(res)) {
     hi_tmp <- lapply(res[[i]]$highlight, FUN = abbrev)
-    hi_tmp <- str_replace_all(hi_tmp,
-                              "[ ]{2,}|\n",
-                              " ")
+    hi_tmp <- str_replace_all(hi_tmp, "[ ]{2,}|\n", " ")
     res_ls[[i]] <- hi_tmp
   }
   res_vec <- unlist(res_ls)
@@ -173,6 +171,8 @@ shinyServer(function(input, output, session) {
     rv$current_page <- rv$current_page + direction
   }
 
+  observeEvent(input$goto_)
+
   observeEvent(input$prevButton, navPage(-1))
   observeEvent(input$nextButton, navPage(1))
   observeEvent(input$tog_extras,
@@ -195,11 +195,7 @@ shinyServer(function(input, output, session) {
 
   # set the number of results per page
   srch_len <- reactive({
-    if(input$show_n == "Hits per page (10)") {
-      return(10)
-    } else {
-      return(as.numeric(input$show_n))
-    }
+    as.numeric(input$show_n)
   })
 
   min_score <- reactive({
@@ -245,49 +241,49 @@ shinyServer(function(input, output, session) {
     if(input$main_input == "") return(NULL)
     if(grepl(cur_input(), pattern = "^(\"|\')[[:print:]]+(\"|\')$")) {
       body <- list(
-                min_score = min_score(),
-                `_source` = list(
-                  excludes = "raw_txt"
-                ),
-                query = list(
-                  match_phrase = list(
-                    raw_txt.shingles = cur_input()
-                  )
-                ),
-                size = max_hits(),
-                highlight = list(
-                  fields = list(
-                    raw_txt.shingles = list(
-                      `type` = "fvh",
-                      `fragment_size` = 150,
-                      `pre_tags` = list("<b>"),
-                      `post_tags` = list("</b>")
-                    )
-                  )
-                )
+        min_score = min_score(),
+        `_source` = list(
+          excludes = "raw_txt"
+        ),
+        query = list(
+          match_phrase = list(
+            raw_txt.shingles = cur_input()
+          )
+        ),
+        size = max_hits(),
+        highlight = list(
+          fields = list(
+            raw_txt.shingles = list(
+              `type` = "fvh",
+              `fragment_size` = 150,
+              `pre_tags` = list("<b>"),
+              `post_tags` = list("</b>")
+            )
+          )
+        )
       )
     } else {
       body <- list(
-                min_score = min_score(),
-                `_source` = list(
-                  excludes = "raw_txt"
-                ),
-                query = list(
-                  match = list(
-                    raw_txt.shingles = cur_input()
-                  )
-                ),
-                size = max_hits(),
-                highlight = list(
-                  fields = list(
-                    raw_txt.shingles = list(
-                      `type` = "fvh",
-                      `fragment_size` = 150,
-                      `pre_tags` = list("<b>"),
-                      `post_tags` = list("</b>")
-                    )
-                  )
-                )
+        min_score = min_score(),
+        `_source` = list(
+          excludes = "raw_txt"
+        ),
+        query = list(
+          match = list(
+            raw_txt.shingles = cur_input()
+          )
+        ),
+        size = max_hits(),
+        highlight = list(
+          fields = list(
+            raw_txt.shingles = list(
+              `type` = "fvh",
+              `fragment_size` = 150,
+              `pre_tags` = list("<b>"),
+              `post_tags` = list("</b>")
+            )
+          )
+        )
       )
     }
     # fgh <- index_clear_cache("esadocs")
@@ -532,11 +528,13 @@ shinyServer(function(input, output, session) {
       shinyjs::hide("res_txt")
       shinyjs::hide("nextButton")
       shinyjs::hide("summ_head")
+      shinyjs::hide("get_results")
       return(NULL)
     }
     shinyjs::show("summ_head")
+    shinyjs::show("get_results")
 
-    observe(print(table(cur_res()$type)))
+    # observe(print(names(cur_res())))
 
     output$doc_types <- DT::renderDataTable({
       doc_tab <- sort(table(cur_res()$type), decreasing = TRUE)
@@ -639,9 +637,42 @@ shinyServer(function(input, output, session) {
         plotOutput("score_plot", height = "350px")
       ),
       type = "pills"
-      # width = 12,
-      # height = "200px"
     )
+
+  })
+
+  output$get_results <- downloadHandler(filename=function() {
+      "search_results.xlsx"
+    },
+    content=function(file) {
+      cur_data <- cur_res()
+      for_write <- make_writeable(cur_data)
+      rio::export(for_write, file = file)
+    }
+  )
+
+  make_writeable <- function(df) {
+    to_txt <- function(x) {
+      if(class(x) == "list") {
+        resvec <- sapply(x, paste, collapse = "; ")
+        return(resvec)
+      }
+      return(x)
+    }
+
+    for(i in names(df)) {
+      df[[i]] <- to_txt(df[[i]])
+    }
+    return(df)
+  }
+
+  output$foot_spacer <- renderUI({
+    if(identical(cur_input(), "") || test_nulls(cur_res())) {
+      return(HTML("<br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br><br>"))
+    } else {
+      return(HTML("<p>NADA</p>"))
+    }
   })
 
 })

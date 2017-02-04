@@ -15,6 +15,7 @@ body <- dashboardBody(fluidPage(
     tags$head(
       HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400'
            rel='stylesheet' type='text/css'>"),
+      HTML('<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />'),
       tags$style(HTML("
         hr {
           border-color: #808080 !important;
@@ -145,6 +146,11 @@ body <- dashboardBody(fluidPage(
 
         .nav-pills>li>a { border-radius: 1px }
 
+        #n_hits {
+          font-weight: bold;
+          padding-top: 10px;
+        }
+
         ")
       )
     ),
@@ -216,8 +222,14 @@ body <- dashboardBody(fluidPage(
                 div(class = "slim",
                   selectInput("show_n",
                               label = NULL,
-                              choices = c("Hits per page (10)", 20, 50, 100),
+                              choices = list(
+                                "5 hits/page" = 5,
+                                "10 hits/page" = 10,
+                                "20 hits/page" = 20,
+                                "50 hits/page" = 50,
+                                "100 hits/page" = 100),
                               width = "95%",
+                              selected = 10,
                               multiple = FALSE)
                 )
               ),
@@ -269,13 +281,16 @@ body <- dashboardBody(fluidPage(
                   "max_hits",
                   label = NULL,
                   choices = list(
-                    "Max hits = 500" = 500,
                     "Max hits = 100" = 100,
+                    "Max hits = 500" = 500,
                     "Max hits = 1000" = 1000,
+                    "Max hits = 5000" = 5000,
                     "Max hits = 10000" = 10000
                   ),
-                  width = "95%"
-                ))
+                  width = "95%",
+                  selected = 500
+                )
+              )
             )
           )
         ),
@@ -284,18 +299,28 @@ body <- dashboardBody(fluidPage(
 
         fluidRow(
           column(8,
-            helpText(textOutput("n_hits")),
+            fluidRow(
+              column(4,
+                textOutput("n_hits")
+              ),
+              column(4),
+              column(4,
+                hidden(
+                  tipify(
+                    downloadButton("get_results", "Download"),
+                    title = "Download an Excel file of these results.",
+                    placement = "right"
+                  )
+                )
+              )
+            ),
             hidden(uiOutput("hits"))
           ),
           column(4,
-            # fluidRow(
-              # column(12,
-                br(),
-                # hidden(h4(id = "summ_head", "Supplemental results")),
-                br(),
-                uiOutput("summary_figs", height = "200px")
-              # )
-            # )
+            br(), br(),
+            fluidRow(
+              uiOutput("summary_figs", height = "200px")
+            )
           )
         ),
         fluidRow(
@@ -323,7 +348,7 @@ body <- dashboardBody(fluidPage(
           column(4)
         ),
         fluidRow(
-          br()
+          br(), br()
         )
       ),
       column(1,
@@ -331,6 +356,24 @@ body <- dashboardBody(fluidPage(
           inputId = "help",
           label = "Help",
           icon = icon("question")
+        )
+      )
+    ),
+    fluidRow(
+      column(
+        12,
+        uiOutput("foot_spacer"),
+        div(
+          style = "text-align:center",
+          HTML('<footer>
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+            <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>
+            <br />
+            This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" rel="dct:type">work</span>
+            by <a xmlns:cc="http://creativecommons.org/ns" href="http://defenders.org" property="cc:attributionName" rel="cc:attributionURL">Defenders of Wildlife</a>
+            is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+          </footer>'),
+          br()
         )
       )
     )
