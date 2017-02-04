@@ -28,7 +28,7 @@ result_asdf <- function(res) {
     services <- get_var(res[[i]]$`_source`, "services")
     spp_tmp <- paste(res[[i]]$`_source`$species[[1]], collapse = "<br>")
     geo <- paste(res[[i]]$`_source`$geo[[1]], collapse = "<br>")
-    tags <- paste(res[[i]]$`_source`$tags, collapse = "<br>")
+    tags <- paste(res[[i]]$`_source`$tags[[1]], collapse = "<br>")
     cur_dat <- data.frame(type = type,
                           title = title,
                           date = date,
@@ -286,10 +286,11 @@ shinyServer(function(input, output, session) {
 
   # MAIN HTML GENERATION
   hit_page <- function(i, data, pg) {
-    observe(print(data$species[i]))
-    observe(print(data$geo[i]))
+    # observe(print(data$species[i]))
+    # observe(print(data$geo[i]))
     div(id = paste0("pg", pg),
       div(class = "search-res",
+        br(),
         fluidRow(
           column(10,
             a(href = ifelse(!is.na(data$pdf_path[i]),
@@ -324,7 +325,7 @@ shinyServer(function(input, output, session) {
                     paste("Score:", round(data$score[i], 3)))
               ),
               column(3,
-                div(class = "info-div",
+                div(class = "info-div-right",
                   if(is.na(data$link[i])) {
                     "No original online"
                   } else {
@@ -383,21 +384,36 @@ shinyServer(function(input, output, session) {
                   placement = "right",
                   trigger = "focus"
                 )
+              ),
+              column(2,
+                popify(
+                  actionLink(
+                    inputId = paste0("tags", i),
+                    label = div(style = "font-weight:300;",
+                                "Tags"),
+                    style = "default"
+                  ),
+                  title = "Tags",
+                  content = data$tags[i],
+                  placement = "right",
+                  trigger = "focus"
+                )
+              ),
+              column(4,
+                tags$div(
+                  style="font-size:small; text-align:right; color:#bfbfbf",
+                  data$id[i]
+                )
               )
             )
           ),
-          column(2,
-            fluidRow(
-              tags$div(style="font-size:small; color:#337ab7",
-                       paste("Doc. ID: ", data$id[i]))
-            )
-          )
-        )
+          column(2)
         ),
         div(style = "background:rgba(0,0,0,0)",
           br()
         )
       )
+    )
   }
 
   n_pages <- reactive({
@@ -470,6 +486,8 @@ shinyServer(function(input, output, session) {
     }
     shinyjs::show("summ_head")
 
+    observe(print(table(cur_res()$type)))
+
     output$score_plot <- renderPlot({
       dat <- data.frame(score = cur_res()$score)
       if(dim(dat)[1] == 0) return(NULL)
@@ -483,8 +501,24 @@ shinyServer(function(input, output, session) {
       return(p)
     })
 
+    output$pages_plot <- renderPlot({
+      dat <- data.frame(score = cur_res()$n_pages)
+      if(dim(dat)[1] == 0) return(NULL)
+      nbin <- floor(dim(dat)[1] / 3)
+      if(nbin < 1) nbin <- 1
+      p <- ggplot(data = dat, aes(score)) +
+             geom_histogram(bins = nbin) +
+             labs(x = "# pages",
+                  y = "# documents") +
+             theme_hc()
+      return(p)
+    })
+
     output$date_plot <- renderPlot({
       dat <- data.frame(date = as.Date(cur_res()$date))
+      output$n_na_date <- renderText({
+        paste("# NA:", sum(is.na(dat$date)) )
+      })
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
@@ -514,18 +548,52 @@ shinyServer(function(input, output, session) {
     return(p)
     })
 
+    output$spp_table <- DT::renderDataTable({
+      spp_list <- str_split(paste(cur_res()$species, collapse = "<br>"), "<br>")
+      spp_tab <- sort(table(spp_list), decreasing = TRUE)
+      spp_df <- data.frame(species = names(spp_tab),
+                           count = as.vector(spp_tab),
+                           stringsAsFactors = FALSE)
+      return(spp_df)
+    })
+
+    output$doc_types <- DT::renderDataTable({
+      doc_tab <- sort(table(cur_res()$type), decreasing = TRUE)
+      doc_df <- data.frame(type = names(doc_tab),
+                           count = as.vector(doc_tab),
+                           stringsAsFactors = FALSE)
+      return(doc_df)
+    })
+
     tabBox(
       tabPanel(
-        title = "Score",
-        plotOutput("score_plot", height = "250px")
-      ),
-      tabPanel(
         title = "Date",
-        plotOutput("date_plot", height = "250px")
+        br(),
+        p(style="font-size:larger", "Document dates"),
+        hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
+        plotOutput("date_plot", height = "350px"),
+        helpText(textOutput("n_na_date"))
       ),
       tabPanel(
         title = "Species",
-        plotOutput("top_spp", height = "250px")
+        br(),
+        p(style="font-size:larger", "Species (taxa) in documents"),
+        hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
+        DT::dataTableOutput("spp_table", height = "250px")
+      ),
+      tabPanel(
+        title = "Type",
+        br(),
+        p(style="font-size:larger", "Types of documents"),
+        hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
+        DT::dataTableOutput("doc_types", height = "250px")
+      ),
+      tabPanel(
+        title = "Score",
+        br(),
+        p(style="font-size:larger", "Document scores given search terms"),
+        hr(style="border-top-color:#d9d9d9 !important; border-top-width:2px"),
+        plotOutput("score_plot", height = "350px")
       ),
       width = 12,
       height = "200px"

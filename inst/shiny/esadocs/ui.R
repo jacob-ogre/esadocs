@@ -105,6 +105,13 @@ body <- dashboardBody(fluidPage(
           padding-bottom: 3px;
         }
 
+        .info-div-right {
+          color: #009933;
+          padding-top: 3px;
+          padding-bottom: 3px;
+          text-align: right;
+        }
+
         .popover {
           border-radius: 1px;
           width: 350px;
@@ -150,21 +157,29 @@ body <- dashboardBody(fluidPage(
           column(1),
           column(9,
             fluidRow(
-              div(class = "input-group", style = "padding-top:20px",
-                  textInput(inputId = "main_input",
-                            label = NULL,
-                            placeholder = "Search ESA documents",
-                            width = "100%"),
-                  span(class = "input-group-btn",
-                       withBusyIndicatorUI(
-                         actionButton(inputId = "search",
-                                  label = NULL,
-                                  icon = icon("search"),
-                                  style = "primary",
-                                  style="font-size:150%;color:white;background-color:#337ab7;border-color:#2e6da4"
-                         )
-                       )
+              div(
+                class = "input-group",
+                style = "padding-top:20px",
+                textInput(
+                  inputId = "main_input",
+                  label = NULL,
+                  placeholder = "Search ESA documents",
+                  width = "100%"),
+                span(
+                  class = "input-group-btn",
+                  withBusyIndicatorUI(
+                    actionButton(
+                      inputId = "search",
+                      label = NULL,
+                      icon = icon("search"),
+                      style = "primary",
+                      style="font-size:150%;
+                             color:white;
+                             background-color:#337ab7;
+                             border-color:#2e6da4"
+                    )
                   )
+                )
               )
             ),
             fluidRow(
@@ -270,7 +285,9 @@ body <- dashboardBody(fluidPage(
           column(4,
             fluidRow(
               column(12,
-                hidden(h4(id = "summ_head", "Summary plots")),
+                br(),
+                hidden(h4(id = "summ_head", "Supplemental results")),
+                br(),
                 uiOutput("summary_figs", height = "200px")
               )
             )
