@@ -171,8 +171,6 @@ shinyServer(function(input, output, session) {
     rv$current_page <- rv$current_page + direction
   }
 
-  observeEvent(input$goto_)
-
   observeEvent(input$prevButton, navPage(-1))
   observeEvent(input$nextButton, navPage(1))
   observeEvent(input$tog_extras,
