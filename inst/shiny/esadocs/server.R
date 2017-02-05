@@ -385,7 +385,7 @@ shinyServer(function(input, output, session) {
         }
         if(!grepl(ln, pattern = "^https")) return(paste0(hypo, ccid, ln))
       } else {
-        return(paste0(hypo, ln))
+        if(!grepl(ln, pattern = hypo)) return(paste0(hypo, ln))
       }
     }
 
