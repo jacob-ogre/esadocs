@@ -1,5 +1,39 @@
 # BSD_2_clause
 
+single_asdf <- function(res) {
+  # observe(print(names(res$`_source`)))
+  get_var <- function(d, v) {
+    if(v %in% names(d$`_source`)) return(d$`_source`[[v]])
+    return(NA)
+  }
+
+  cur_dat <- data.frame(
+    type = res$`_type`,
+    score = 0,
+    id = res$`_id`,
+    title = get_var(res, "title"),
+    date = get_var(res, "date"),
+    file_name = get_var(res, "file_name"),
+    link = get_var(res, "link"),
+    pdf_path = get_var(res, "pdf_path"),
+    txt_path = get_var(res, "txt_path"),
+    pdf_md5 = get_var(res, "pdf_md5"),
+    n_pages = get_var(res, "n_pages"),
+    fr_citation_page = get_var(res, "fr_citation_page"),
+    federal_agency = get_var(res, "federal_agency"),
+    activity_code = get_var(res, "activity_code"),
+    ch_status = get_var(res, "ch_status"),
+    doc_type = get_var(res, "doc_type"),
+    species = paste(res$`_source`$species[[1]],
+                    collapse = "<br>"),
+    geo = paste(res$`_source`$geo[[1]], collapse = "<br>"),
+    tags = paste(res$`_source`$tags[[1]], collapse = "<br>"),
+    highlight <- "<br><p>No snippet generated from a direct lookup.</p><br>",
+    stringsAsFactors = FALSE
+  )
+  return(cur_dat)
+}
+
 result_asdf <- function(res) {
   score_ls <- vector("list", length(res))
   res_ls <- vector("list", length(res))
@@ -237,6 +271,14 @@ shinyServer(function(input, output, session) {
   # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
     if(input$main_input == "") return(NULL)
+    if(grepl(cur_input(), pattern = "^id:")) {
+      cur_id <- gsub(cur_input(), pattern = "^id:|^id: ", replacement = "")
+      the_doc <- try(docs_get("esadocs", "_all", cur_id), silent = TRUE)
+      if(class(the_doc) == "try-error") return(NULL)
+      res_df <- single_asdf(the_doc)
+      # observe(print(res_df))
+      return(res_df)
+    }
     if(grepl(cur_input(), pattern = "^(\"|\')[[:print:]]+(\"|\')$")) {
       body <- list(
         min_score = min_score(),
