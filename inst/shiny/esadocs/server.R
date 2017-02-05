@@ -1,7 +1,6 @@
 # BSD_2_clause
 
 single_asdf <- function(res) {
-  # observe(print(names(res$`_source`)))
   get_var <- function(d, v) {
     if(v %in% names(d$`_source`)) return(d$`_source`[[v]])
     return(NA)
@@ -372,16 +371,31 @@ shinyServer(function(input, output, session) {
 
   # MAIN HTML GENERATION
   hit_page <- function(i, data, pg) {
-    # observe(print(data$species[i]))
-    # observe(print(data$geo[i]))
+    make_href <- function(ln) {
+      hypo <- "https://via.hypothes.is/"
+      ccid <- "https://esadocs.cci-dev.org"
+      if(!grepl(ln, pattern = "^https://esadocs.cci-dev.org")) {
+        if(grepl(ln, pattern = "https://cci-dev.org")) {
+          ln <- gsub(ln, pattern = "^https://cci-dev.org", replacement = ccid)
+        }
+        return(paste0(hypo, ln))
+        if(grepl(ln, pattern = "https://defend-esc-dev.org")) {
+          ln <- gsub(ln, pattern = "https://defend-esc-dev.org", replacement = ccid)
+        }
+        return(paste0(hypo, ccid, ln))
+      } else {
+        return(paste0(hypo, ln))
+      }
+    }
+
     div(id = paste0("pg", pg),
       div(class = "search-res",
         br(),
         fluidRow(
           column(10,
             a(href = ifelse(!is.na(data$pdf_path[i]),
-                            data$pdf_path[i],
-                            data$link[i]),
+                            make_href(data$pdf_path[i]),
+                            make_href(data$link[i])),
               target = "_blank",
               span(
                 if(!is.null(data$title[i])) {
