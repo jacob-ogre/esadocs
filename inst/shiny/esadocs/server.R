@@ -377,12 +377,13 @@ shinyServer(function(input, output, session) {
       if(!grepl(ln, pattern = "^https://esadocs.cci-dev.org")) {
         if(grepl(ln, pattern = "https://cci-dev.org")) {
           ln <- gsub(ln, pattern = "^https://cci-dev.org", replacement = ccid)
+          return(paste0(hypo, ln))
         }
-        return(paste0(hypo, ln))
         if(grepl(ln, pattern = "https://defend-esc-dev.org")) {
           ln <- gsub(ln, pattern = "https://defend-esc-dev.org", replacement = ccid)
+          return(paste0(hypo, ln))
         }
-        return(paste0(hypo, ccid, ln))
+        if(!grepl(ln, pattern = "^https")) return(paste0(hypo, ccid, ln))
       } else {
         return(paste0(hypo, ln))
       }
