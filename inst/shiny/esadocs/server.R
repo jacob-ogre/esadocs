@@ -2,9 +2,17 @@
 
 single_asdf <- function(res) {
   get_var <- function(d, v) {
-    if(v %in% names(d$`_source`)) return(d$`_source`[[v]])
+    if(v %in% names(d$`_source`) & length(d$`_source`[[v]] > 0)) {
+      observe(print(v))
+      observe(print(length(d$`_source`[[v]])))
+      return(d$`_source`[[v]])
+    }
     return(NA)
   }
+
+  # observe(print(names(res$`_source`)))
+  # observe(print(res$`_type`))
+  # observe(print(res$`_id`))
 
   cur_dat <- data.frame(
     type = res$`_type`,
@@ -19,15 +27,16 @@ single_asdf <- function(res) {
     pdf_md5 = get_var(res, "pdf_md5"),
     n_pages = get_var(res, "n_pages"),
     fr_citation_page = get_var(res, "fr_citation_page"),
-    federal_agency = get_var(res, "federal_agency"),
     activity_code = get_var(res, "activity_code"),
     ch_status = get_var(res, "ch_status"),
     doc_type = get_var(res, "doc_type"),
+    federal_agency = paste(res$`_source`$federal_agency[[1]],
+                           collapse = "<br>"),
     species = paste(res$`_source`$species[[1]],
                     collapse = "<br>"),
     geo = paste(res$`_source`$geo[[1]], collapse = "<br>"),
     tags = paste(res$`_source`$tags[[1]], collapse = "<br>"),
-    highlight <- "<br><p>No snippet generated from a direct lookup.</p><br>",
+    highlight = "<br><p>No snippet generated from a direct lookup.</p><br>",
     stringsAsFactors = FALSE
   )
   return(cur_dat)
@@ -134,46 +143,65 @@ shinyServer(function(input, output, session) {
   observeEvent(input$help, {
     showModal(
       modalDialog(
-        title = "Help",
-        h3("Getting started"),
+        title = "Getting started",
         div(style="font-size:larger",
-          p("ESAdocs Search makes it easy to find documents related to the
-            U.S. Endangered Species Act (ESA). To get started:"),
-          tags$ol("1. Enter your search term"),
-          tags$ol("2. Press the magnifier to search"),
-          HTML("<img src='new_img.png' width='100%'>"),
-          p("Notice that the search can be refined with the Filter (red arrow)"),
-          hr(),
-          p(strong("Note:"), "Searches may take several seconds depending on
-            the specifics of the terms you are looking for or the max number of
-            results you allow."),
-          hr(),
-          h4("Filters"),
-          p("Filters can be applied to broaden or narrow the search results.
-            Currently, filters include:"),
-          tags$ol("1. How many results to show per page"),
-          tags$ol("2. A date range to restrict results"),
-          tags$ol("3. The type of documents to search"),
-          tags$ol("4. The minimum search score to include"),
-          tags$ol("5. The maximum number of hits to include"),
-          HTML("<img src='new_filter_img.png' width='100%'>"),
-          p("The more lenient the filters, the longer a search will take."),
-          hr(),
-          h4("Results"),
-          p("The results are pretty simple:"),
-          tags$ol("1. Each document includes a link to the PDF, a text snippet,
-                  and additional metadata"),
-          tags$ol("2. The 'green line' includes the document type, date, score
-                  given the search, and a link to the original version (if
-                  available)"),
-          tags$ol("3. The 'blue line' includes extracted pieces of data,
-                  including species, places, gov't agencies, tags, and (in gray)
-                  the internal document ID."),
-          tags$ol("4. Several summaries across all hits are calculated in the
-                  supplemental results sidebar. The exact contents will evolve
-                  as the app is used."),
-          HTML("<img src='searched_img.png' width='100%'>"),
-          p("We note that the details of search results may change.")
+          div(style="background-color:#f2f2f2; padding:5px",
+            p("ESAdocs Search makes it easy to find documents related to the
+              U.S. Endangered Species Act (ESA). To get started:"),
+            tags$ol(
+              tags$li("Enter your search term"),
+              tags$li("Press the magnifier to search")
+            ),
+            HTML("<img src='new_img.png' width='90%' style='padding-left:5px'>"),
+            p("Notice that the search can be refined with the Filter (red arrow)"),
+            hr(),
+            p(strong("Note:"), "Searches may take several seconds depending on
+              the specifics of the terms you are looking for or the max number of
+              results you allow."),
+            hr()
+          ),
+          div(style="padding:5px",
+            h3("Filters"),
+            p("Filters can be applied to broaden or narrow the search results.
+              Currently, filters include:"),
+            tags$ol(
+              tags$li("How many results to show per page"),
+              tags$li("A date range to restrict results"),
+              tags$li("The type of documents to search"),
+              tags$li("The minimum search score to include"),
+              tags$li("The maximum number of hits to include")
+            ),
+            HTML("<img src='new_filter_img.png' width='100%'>"),
+            p("The more lenient the filters, the longer a search will take."),
+            hr()
+          ),
+          div(style="background-color:#f2f2f2; padding:5px",
+            h3("Results"),
+            p("The results are pretty simple:"),
+            tags$ol(
+              tags$li("Each document includes a link to the PDF, a text snippet,
+                    and additional metadata"),
+              tags$li("The 'green line' includes the document type, date, score
+                      given the search, and a link to the original version (if
+                      available)"),
+              tags$li("The 'blue line' includes extracted pieces of data,
+                      including species, places, gov't agencies, tags, and (in gray)
+                      the internal document ID."),
+              tags$li("Several summaries across all hits are calculated in the
+                      supplemental results sidebar. The exact contents will evolve
+                      as the app is used.")
+            ),
+            HTML("<img src='searched_img.png' width='100%'>"),
+            p("We note that the details of search results may change."),
+            hr()
+          ),
+          div(style="padding:5px",
+            h3("Advanced search tips"),
+            tags$ul(
+              tags$li("If you want one document, use 'id: <document ID>' for phrase"),
+              tags$li("More to come...")
+            )
+          )
         ),
         size = "l",
         easyClose = TRUE
@@ -589,8 +617,6 @@ shinyServer(function(input, output, session) {
     }
     shinyjs::show("summ_head")
     shinyjs::show("get_results")
-
-    # observe(print(names(cur_res())))
 
     output$doc_types <- DT::renderDataTable({
       doc_tab <- sort(table(cur_res()$type), decreasing = TRUE)
