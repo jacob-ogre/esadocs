@@ -46,6 +46,10 @@
         "type": "long",
         "index": "not_analyzed"
       },
+      "federal_agency": {
+        "type": "keyword",
+        "index": "not_analyzed"
+      },
       "species": {
         "type": "keyword",
         "index": "not_analyzed"

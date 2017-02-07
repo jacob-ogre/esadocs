@@ -157,16 +157,32 @@ body <- dashboardBody(fluidPage(
 
     br(),
     fluidRow(
+      div(
+        id = "spacer",
+        br(), br(), br(), br(), br(), br(),
+        div(id = "esadocs_large",
+          tags$a(href="https://esadocs.cci-dev.org",
+            img(src = "ESAdocs_search_lg.svg",
+                height = "140px")
+          )
+        )
+      )
+    ),
+    fluidRow(
       column(1,
-        tags$a(href="https://esadocs.cci-dev.org",
-          img(src = "ESAdocs_search.svg",
-              height = "80px")
+        hidden(
+          div(id = "esadocs_small",
+            tags$a(href="https://esadocs.cci-dev.org",
+              img(src = "ESAdocs_search.svg",
+                  height = "80px")
+            )
+          )
         )
       ),
       column(10,
         fluidRow(
-          column(1),
-          column(9,
+          column(2),
+          column(8,
             fluidRow(
               div(
                 class = "input-group",
@@ -198,26 +214,29 @@ body <- dashboardBody(fluidPage(
             )
           ),
           column(2,
-            div(style = "position: absolute; right:0px",
-                tags$a(href="http://www.defenders.org",
-                  img(src = "DOW_logo_small.png")
-                )
+            fluidRow(
+              actionButton(
+                inputId = "help",
+                label = "Help",
+                icon = icon("question")
+              )
+            ),
+            fluidRow(
+              actionButton(
+                inputId = "tog_extras",
+                label = "Filters",
+                # icon = icon("filter"),
+                size = "small",
+                type = "toggle",
+                value = FALSE
+              )
             )
           )
         ),
         fluidRow(
-          column(1,
-            actionButton(
-              inputId = "tog_extras",
-              label = "Filters",
-              # icon = icon("filter"),
-              size = "large",
-              type = "toggle",
-              value = FALSE
-            )
-          ),
           hidden(
             div(id = "extras",
+              hr(style = "padding-above:2px; margin:1px"),
               column(2,
                 div(class = "slim",
                   selectInput("show_n",
@@ -295,7 +314,6 @@ body <- dashboardBody(fluidPage(
           )
         ),
 
-        hr(style = "padding-above:2px; margin:1px"),
 
         fluidRow(
           column(8,
@@ -325,6 +343,7 @@ body <- dashboardBody(fluidPage(
         ),
         fluidRow(
           column(8,
+            br(),
             div(
               id = "nextprev",
               style = "width:50%; margin:0 auto;",
@@ -352,30 +371,54 @@ body <- dashboardBody(fluidPage(
         )
       ),
       column(1,
-        actionButton(
-          inputId = "help",
-          label = "Help",
-          icon = icon("question")
-        )
-      )
+        hidden(div(
+          id = "top_dow",
+          style = "position: absolute; right:10px",
+          tags$a(href="http://www.defenders.org",
+            img(src = "DOW_logo_small.png")
+          )
+        ))
+      ),
+      br()
+    ),
+    fluidRow(
+      div(
+        id = "pad_foot",
+        br(), br(), br(), br(), br(), br()
+      ),
+      hidden(div(
+        id = "pad_foot_2",
+        br(), br(), br()
+      ))
+    ),
+    fluidRow(
+      column(5),
+      column(1,
+        HTML('
+          <a href="http://defenders.org">
+          <img style="vertical-align:middle" src="DOW_logo_small.png" height="60"></a>
+        ')
+      ),
+      column(1,
+        HTML('
+          <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+          <img alt="Creative Commons License" style="border-width:0;padding-top:15px" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>
+        ')
+      ),
+      column(1)
     ),
     fluidRow(
       column(1),
-      column(
-        10,
-        uiOutput("foot_spacer"),
+      column(10,
         div(
           style = "text-align:center",
-          hr(),
           HTML('<footer>
-            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
-            <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>
             <br />
-            This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" rel="dct:type">work</span>
+            <p>This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" rel="dct:type">work</span>
             by <a xmlns:cc="http://creativecommons.org/ns" href="http://defenders.org" property="cc:attributionName" rel="cc:attributionURL">Defenders of Wildlife</a>
-            is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+            is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</p>
+            <br />
           </footer>'),
-          hr(),
           br()
         )
       ),

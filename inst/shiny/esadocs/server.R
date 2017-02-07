@@ -80,7 +80,7 @@ result_asdf <- function(res) {
                           txt_path = txt_path,
                           # raw_txt = raw_text,
                           pdf_md5 = pdf_md5,
-                          n_pages = n_pages,
+                          n_pages = as.numeric(n_pages),
                           fr_citation_page = fr_citation_page,
                           federal_agency = federal_agency,
                           activity_code = activity_code,
@@ -297,6 +297,11 @@ shinyServer(function(input, output, session) {
   # MAIN SEARCH FUNCTION; note 500-result limit at this time, very simple search
   # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
+    hide("spacer", anim = TRUE, animType = "slide", time = 0.2)
+    hide("esadocs_large", anim = TRUE, animType = "fade", time = 0.2)
+    hide("pad_foot", anim = TRUE, animType = "fade", time = 0.8)
+    show("esadocs_small", anim = TRUE, animType = "fade", time = 0.2)
+    show("top_dow", anim = TRUE, animType = "fade", time = 0.2)
     if(input$main_input == "") return(NULL)
     if(grepl(cur_input(), pattern = "^id:")) {
       cur_id <- gsub(cur_input(), pattern = "^id:|^id: ", replacement = "")
@@ -628,7 +633,7 @@ shinyServer(function(input, output, session) {
     })
 
     output$pages_plot <- renderPlot({
-      dat <- data.frame(score = cur_res()$n_pages)
+      dat <- data.frame(score = as.numeric(cur_res()$n_pages))
       if(dim(dat)[1] == 0) return(NULL)
       nbin <- floor(dim(dat)[1] / 3)
       if(nbin < 1) nbin <- 1
