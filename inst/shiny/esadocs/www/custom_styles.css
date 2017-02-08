@@ -1,149 +1,165 @@
 /*Some custom css to modify the standard Shiny values. */
 
-.modal-dialog {
-    width: 75%;
+hr {
+  border-color: #808080 !important;
+  height: 2px;
+}
+
+a {
+  color: #0E3670;
 }
 
 .box {
-    margin-bottom: 0;
-}
-
-.box.box-warning {
-    border-top-color: #ffffff;
-}
-
-.box.box-primary {
-    border-top-color: #0A4783;
-}
-.box.box-solid.box-primary {
-  border: 1px solid #0A4783;
-}
-
-.box.box-solid.box-primary > .box-header {
-  color: #ffffff;
-  background-color: #0A4783;
-}
-.box.box-solid.box-primary > .box-header a,
-.box.box-solid.box-primary > .box-header .btn {
-  color: #ffffff;
-}
-
-.btn-primary {
-    background-color: #0A4783;
-    border-color: #367fa9;
-}
-
-.bg-orange {
-    background-color: #f49831 !important;
-}
-
-.bg-blue {
-    background-color: #0A4783 !important;
-}
-
-input[type="number"] {
-  max-width: 80%;
+  box-shadow: 2px 2px 2px #d9d9d9;
 }
 
 div.outer {
-    position: fixed;
-    background-color: white;
-    top: 41px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    padding: 0;
-}
-
-div.graph-outer {
-    /* position: fixed; */
-    background-color: white;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    padding: 0;
+  background-color: white;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0;
 }
 
 /* Customize fonts */
 body, label, input, button, select {
   font-family: 'Open Sans';
-  /* font-family: 'Helvetica Neue', Helvetica; */
   font-weight: 300;
 }
 h1, h2, h3, h4 { font-weight: 400; }
 
-#controls {
-  /* Appearance */
-  background-color: white;
-  padding: 0 0 0 0;
-  cursor: move;
-  /* Fade out while not hovering */
-  opacity: 0.8;
-  zoom: 0.9;
-  transition: opacity 500ms 1s;
-}
-#controls:hover {
-  /* Fade in while hovering */
-  opacity: 0.97;
-  transition-delay: 0;
-}
-
-#help-button-box {
-  /* Appearance */
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  padding: 0 0 0 0;
-  /* Fade out while not hovering */
-  opacity: 0.85;
-  zoom: 0.9;
-  transition: opacity 500ms 1s;
-}
-#controls:hover {
-  /* Fade in while hovering */
-  opacity: 0.99;
-  transition-delay: 0;
-}
-
-#controls-graph {
-  /* Appearance */
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  padding: 20px 20px 20px 20px;
-  /* Fade out while not hovering */
-  opacity: 0.9;
-  zoom: 0.9;
-  transition: opacity 500ms 1s;
-}
-
-/* Position and style citation */
-#cite {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  font-size: 12px;
-}
-
-/* If not using map tiles, show a white background */
-.leaflet-container {
-  background-color: white !important;
-}
-
-.bottom-align {
-    position: absolute;
-    bottom: 12px;
-}
-
-.leaflet-control-zoomhome a {
-    font: bold 18px "Lucida Console",Monaco,monospace;
-}
-
 .search-res {
   background-color:white;
-  padding: 5px 10px 5px 10px;
-  box-shadow: 3px 3px 2px gray;
+  border-bottom: 1px solid #f2f2f2;
+  padding-bottom: 5px;
 }
+
+.selectize-input {
+  border-color: white;
+  font-size: small;
+  margin-bottom: -10px;
+}
+
+.selectize-dropdown {
+  font-size: small;
+}
+
+.btn-default, .sbs-toggle-button, .btn-xs {
+  border-color: white;
+}
+
+.btn-default, .sbs-toggle-button, .action-button {
+  border-radius: 1px;
+  font-weight: bold;
+}
+
+.btn-default, .action-button:hover {
+  border-radius: 1px;
+  border-color: white;
+}
+
+/* DATE RANGE SELECTOR */
+.input-sm {
+  background-color: #f2f2f2;
+  border-color: white;
+  color: #404040;
+}
+
+.input-group-addon {
+  background-color: #404040;
+  color: white;
+}
+/* DATE RANGE SELECTOR */
+
+.dropdown-toggle {
+  border-color: white;
+  font-size: small;
+}
+
+.dropdown-menu {
+  font-size: small;
+  padding-left: 10px;
+  border-radius: 1px;
+}
+
+img {
+  display: block;
+  margin: auto;
+}
+
+.info-div {
+  color: #71B8A5 !important;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.info-div-right {
+  color: #71B8A5 !important;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: right;
+}
+
+.info_div_a {
+  color: #71B8A5 !important;
+}
+
+.tag_info {
+  color: #0E3670 !important;
+  font-weight: 300;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.doc_id {
+  color:#bfbfbf;
+  font-size:small;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align:right;
+}
+
+.popover {
+  border-radius: 1px;
+  width: 350px;
+  max-width: 350px;
+}
+
+.popover-title {
+  font-size: 110%;
+  font-weight: bold;
+}
+
+.popover-content {
+  font-size: 90%;
+  font-weight: light;
+}
+
+.nav-tabs>li>a, .nav-tabs>li.active {
+  border-radius: 1px;
+}
+
+.nav-pills>li.active>a,
+.nav-pills>li.active>a:focus,
+.nav-pills>li.active>a:hover {
+  border-radius: 2px;
+  background-color: #0E3670;
+}
+
+.nav>li>a:focus, .nav>li>a:hover {
+  border-radius: 2px;
+}
+
+.nav-pills>li>a { border-radius: 1px }
+
+#n_hits {
+  font-weight: bold;
+  padding-top: 10px;
+}
+
+#n_filt_hit {
+  font-weight: bold;
+  padding-top: 10px;
+}
+

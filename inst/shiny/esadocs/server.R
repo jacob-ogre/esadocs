@@ -297,11 +297,11 @@ shinyServer(function(input, output, session) {
   # MAIN SEARCH FUNCTION; note 500-result limit at this time, very simple search
   # function that needs to be beefed up
   cur_res <- eventReactive(input$search, {
-    hide("spacer", anim = TRUE, animType = "slide", time = 0.2)
-    hide("esadocs_large", anim = TRUE, animType = "fade", time = 0.2)
-    hide("pad_foot", anim = TRUE, animType = "fade", time = 0.8)
-    show("esadocs_small", anim = TRUE, animType = "fade", time = 0.2)
-    show("top_dow", anim = TRUE, animType = "fade", time = 0.2)
+    hide("spacer", anim = TRUE, animType = "slide", time = 0.1)
+    hide("esadocs_large", anim = TRUE, animType = "fade", time = 0.1)
+    hide("pad_foot", anim = TRUE, animType = "fade", time = 0.1)
+    show("esadocs_small", anim = TRUE, animType = "fade", time = 0.1)
+    show("top_dow", anim = TRUE, animType = "fade", time = 0.1)
     if(input$main_input == "") return(NULL)
     if(grepl(cur_input(), pattern = "^id:")) {
       cur_id <- gsub(cur_input(), pattern = "^id:|^id: ", replacement = "")
@@ -358,7 +358,6 @@ shinyServer(function(input, output, session) {
         )
       )
     }
-    # fgh <- index_clear_cache("esadocs")
     cur_mats <- Search("esadocs",
                        type = cur_type(),
                        body = body)$hits$hits
@@ -396,7 +395,7 @@ shinyServer(function(input, output, session) {
     if(test_nulls(cur_res())) {
       return("")
     } else if(n_match() > 1) {
-      return(paste(n_match(), "matches"))
+      return(paste("About", n_match(), "matches"))
     } else {
       return(paste(n_match(), "match"))
     }
@@ -465,6 +464,7 @@ shinyServer(function(input, output, session) {
                   } else {
                     span(icon("external-link"),
                          a(href = data$link[i],
+                         class = "info_div_a",
                          target = "_blank",
                          "Original online"))
                   }
@@ -481,7 +481,7 @@ shinyServer(function(input, output, session) {
                 popify(
                   actionLink(
                     inputId = paste0("spp", i),
-                    label = div(style = "font-weight:300;",
+                    label = div(class = "tag_info",
                                 "Species"),
                     style = "default"
                   ),
@@ -495,7 +495,7 @@ shinyServer(function(input, output, session) {
                 popify(
                   actionLink(
                     inputId = paste0("state", i),
-                    label = div(style = "font-weight:300;",
+                    label = div(class = "tag_info",
                                 "Geo-tags"),
                     style = "default"
                   ),
@@ -509,7 +509,7 @@ shinyServer(function(input, output, session) {
                 popify(
                   actionLink(
                     inputId = paste0("rel_agency", i),
-                    label = div(style = "font-weight:300;",
+                    label = div(class = "tag_info",
                                 "Agencies"),
                     style = "default"
                   ),
@@ -523,7 +523,7 @@ shinyServer(function(input, output, session) {
                 popify(
                   actionLink(
                     inputId = paste0("tags", i),
-                    label = div(style = "font-weight:300;",
+                    label = div(class = "tag_info",
                                 "Tags"),
                     style = "default"
                   ),
@@ -535,7 +535,7 @@ shinyServer(function(input, output, session) {
               ),
               column(4,
                 tags$div(
-                  style="font-size:small; text-align:right; color:#bfbfbf",
+                  class = "doc_id",
                   data$id[i]
                 )
               )
@@ -551,13 +551,13 @@ shinyServer(function(input, output, session) {
   }
 
   n_pages <- reactive({
-    if(!test_nulls(cur_res())) {
-      n_hits <- length(cur_res()[,1])
-      n_pages <- n_hits %/% srch_len()
+    if(!test_nulls(res_df())) {
+      n_hits <- length(res_df()[,1])
+      n_pages_l <- n_hits %/% srch_len()
       if(n_hits %% srch_len() != 0) {
-        n_pages <- n_pages + 1
+        n_pages_l <- n_pages_l + 1
       }
-      return(n_pages)
+      return(n_pages_l)
     } else {
       return(1)
     }
@@ -565,9 +565,9 @@ shinyServer(function(input, output, session) {
 
   generate_hits <- function(dat) {
     n_hits <- length(dat[,1])
-    n_pages <- n_pages()
-    page_ls <- as.list(rep(NA, n_pages))
-    pages <- 1:n_pages
+    # n_pages <- n_pages()
+    page_ls <- as.list(rep(NA, n_pages()))
+    pages <- 1:n_pages()
     breaks <- seq(1, n_hits, srch_len())
     if(length(breaks) == 1) {
       page_ls[[1]] <- lapply(1:length(dat[, 1]), hit_page, data = dat, pg = 1)
@@ -591,12 +591,47 @@ shinyServer(function(input, output, session) {
     return(page_ls)
   }
 
+  res_df <- reactive({
+    if(input$sortby == "rev_score") {
+      res_dft <- dplyr::arrange(cur_res(), score)
+    } else if(input$sortby == "date") {
+      res_dft <- dplyr::arrange(cur_res(), date)
+    } else if(input$sortby == "rev_date") {
+      res_dft <- dplyr::arrange(cur_res(), desc(date))
+    } else {
+      res_dft <- cur_res()
+    }
+    if(input$min_score != 0.1) {
+      res_dft <- dplyr::filter(res_dft, score >= input$min_score)
+    }
+    if(dim(res_dft)[1] == 0) {
+      return(h4("No matches greater than filter score; please adjust."))
+    }
+    if(input$type_filt != "all") {
+      res_dft <- dplyr::filter(res_dft, type == input$type_filt)
+    }
+    if(dim(res_dft)[1] == 0) {
+      return(h4("No matches for that type; please adjust type."))
+    }
+    return(res_dft)
+  })
+
   output$hits <- renderUI({
     if(test_nulls(cur_res())) {
       h4("No matches; please enter another search.")
     } else {
-      pages <- generate_hits(cur_res())
-      output$foot_spacer <- renderUI({HTML("<br>")})
+      if(class(res_df()) != "data.frame") {
+        return(res_df())
+      }
+      output$n_filt_hit <- reactive({
+        filt_hits <- dim(res_df())[1]
+        if(filt_hits > 1) {
+          return(paste("(Filtered:", dim(res_df())[1], "hits)"))
+        } else {
+          return(paste("(One filtered hit)"))
+        }
+      })
+      pages <- generate_hits(res_df())
       if(length(pages) > 1) {
         shinyjs::show("prevButton")
         shinyjs::show("res_txt")
@@ -618,10 +653,12 @@ shinyServer(function(input, output, session) {
       shinyjs::hide("nextButton")
       shinyjs::hide("summ_head")
       shinyjs::hide("get_results")
+      shinyjs::hide("sortby")
       return(NULL)
     }
     shinyjs::show("summ_head")
     shinyjs::show("get_results")
+    shinyjs::show("sortby")
 
     output$doc_types <- DT::renderDataTable({
       doc_tab <- sort(table(cur_res()$type), decreasing = TRUE)

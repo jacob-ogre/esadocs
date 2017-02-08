@@ -16,143 +16,7 @@ body <- dashboardBody(fluidPage(
       HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400'
            rel='stylesheet' type='text/css'>"),
       HTML('<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />'),
-      tags$style(HTML("
-        hr {
-          border-color: #808080 !important;
-          height: 2px;
-        }
-
-        .box {
-          box-shadow: 2px 2px 2px #d9d9d9;
-        }
-
-        div.outer {
-          background-color: white;
-          top: 50px;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          padding: 0;
-        }
-
-        /* Customize fonts */
-        body, label, input, button, select {
-          font-family: 'Open Sans';
-          font-weight: 300;
-        }
-        h1, h2, h3, h4 { font-weight: 400; }
-
-        .search-res {
-          background-color:white;
-          border-bottom: 1px solid #f2f2f2;
-          padding-bottom: 5px;
-        }
-
-        .selectize-input {
-          border-color: white;
-          font-size: small;
-          margin-bottom: -10px;
-        }
-
-        .selectize-dropdown {
-          font-size: small;
-        }
-
-        .btn-default, .sbs-toggle-button, .btn-xs {
-          border-color: white;
-        }
-
-        .btn-default, .sbs-toggle-button, .action-button {
-          border-radius: 1px;
-          font-weight: bold;
-        }
-
-        .btn-default, .action-button:hover {
-          border-radius: 1px;
-          border-color: white;
-        }
-
-        /* DATE RANGE SELECTOR */
-        .input-sm {
-          background-color: #f2f2f2;
-          border-color: white;
-          color: #404040;
-        }
-
-        .input-group-addon {
-          background-color: #404040;
-          color: white;
-        }
-        /* DATE RANGE SELECTOR */
-
-        .dropdown-toggle {
-          border-color: white;
-          font-size: small;
-        }
-
-        .dropdown-menu {
-          font-size: small;
-          padding-left: 10px;
-          border-radius: 1px;
-        }
-
-        img {
-          display: block;
-          margin: auto;
-        }
-
-        .info-div {
-          color: #009933;
-          padding-top: 3px;
-          padding-bottom: 3px;
-        }
-
-        .info-div-right {
-          color: #009933;
-          padding-top: 3px;
-          padding-bottom: 3px;
-          text-align: right;
-        }
-
-        .popover {
-          border-radius: 1px;
-          width: 350px;
-          max-width: 350px;
-        }
-
-        .popover-title {
-          font-size: 110%;
-          font-weight: bold;
-        }
-
-        .popover-content {
-          font-size: 90%;
-          font-weight: light;
-        }
-
-        .nav-tabs>li>a, .nav-tabs>li.active {
-          border-radius: 1px;
-        }
-
-        .nav-pills>li.active>a,
-        .nav-pills>li.active>a:focus,
-        .nav-pills>li.active>a:hover {
-          border-radius: 2px;
-        }
-
-        .nav>li>a:focus, .nav>li>a:hover {
-          border-radius: 2px;
-        }
-
-        .nav-pills>li>a { border-radius: 1px }
-
-        #n_hits {
-          font-weight: bold;
-          padding-top: 10px;
-        }
-
-        ")
-      )
+      tags$style(HTML(readLines("www/custom_styles.css")))
     ),
 
     br(),
@@ -200,10 +64,10 @@ body <- dashboardBody(fluidPage(
                       label = NULL,
                       icon = icon("search"),
                       style = "primary",
-                      style="font-size:150%;
-                             color:white;
-                             background-color:#337ab7;
-                             border-color:#2e6da4"
+                      style="font-size: 150%;
+                             color: white;
+                             background-color: #0E3670;
+                             border-color: #2e6da4"
                     )
                   )
                 )
@@ -233,6 +97,7 @@ body <- dashboardBody(fluidPage(
             )
           )
         ),
+        fluidRow(textOutput("testing_msg")),
         fluidRow(
           hidden(
             div(id = "extras",
@@ -250,6 +115,20 @@ body <- dashboardBody(fluidPage(
                               width = "95%",
                               selected = 10,
                               multiple = FALSE)
+                )
+              ),
+              column(1,
+                selectInput(
+                  inputId = "sortby",
+                  label = NULL,
+                  choices = list(
+                    "Sort" = "score",
+                    "Rev. Score" = "rev_score",
+                    "Date" = "date",
+                    "Rev. Date" = "rev_date"
+                  ),
+                  selected = "score",
+                  width = "125%"
                 )
               ),
               column(3,
@@ -290,6 +169,7 @@ body <- dashboardBody(fluidPage(
                     "Min score = 0.5" = 0.5,
                     "Min score = 1" = 1,
                     "Min score = 5" = 5,
+                    "Min score = 10" = 10,
                     "No filter (0)" = 0
                   ),
                   width = "95%"
@@ -314,14 +194,16 @@ body <- dashboardBody(fluidPage(
           )
         ),
 
-
         fluidRow(
           column(8,
             fluidRow(
-              column(4,
+              column(3,
                 textOutput("n_hits")
               ),
-              column(4),
+              column(3,
+                textOutput("n_filt_hit")
+              ),
+              column(2),
               column(4,
                 hidden(
                   tipify(
@@ -337,7 +219,7 @@ body <- dashboardBody(fluidPage(
           column(4,
             br(), br(),
             fluidRow(
-              uiOutput("summary_figs", height = "200px")
+              uiOutput("summary_figs", height = "300px")
             )
           )
         ),
@@ -387,7 +269,6 @@ body <- dashboardBody(fluidPage(
         br(), br(), br(), br(), br(), br()
       ),
       hidden(div(
-        id = "pad_foot_2",
         br(), br(), br()
       ))
     ),
@@ -405,7 +286,7 @@ body <- dashboardBody(fluidPage(
           <img alt="Creative Commons License" style="border-width:0;padding-top:15px" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>
         ')
       ),
-      column(1)
+      column(5)
     ),
     fluidRow(
       column(1),
