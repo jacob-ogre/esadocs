@@ -16,7 +16,8 @@ body <- dashboardBody(fluidPage(
       HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400'
            rel='stylesheet' type='text/css'>"),
       HTML('<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />'),
-      tags$style(HTML(readLines("www/custom_styles.css")))
+      tags$style(HTML(readLines("www/custom_styles.css"))),
+      tags$script(src = "enter_button.js")
     ),
 
     br(),
@@ -24,8 +25,11 @@ body <- dashboardBody(fluidPage(
       div(
         id = "spacer",
         br(), br(), br(), br(), br(), br(),
-        div(id = "esadocs_large",
-          tags$a(href="https://esadocs.cci-dev.org",
+        div(
+          id = "esadocs_large",
+          tags$a(
+            href="https://esadocs.cci-dev.org",
+            tabindex = "-1",
             img(src = "ESAdocs_search_lg.svg",
                 height = "140px")
           )
@@ -54,7 +58,7 @@ body <- dashboardBody(fluidPage(
                 textInput(
                   inputId = "main_input",
                   label = NULL,
-                  placeholder = "Search ESA documents",
+                  placeholder = "Use quotes for better performance",
                   width = "100%"),
                 span(
                   class = "input-group-btn",
@@ -101,7 +105,7 @@ body <- dashboardBody(fluidPage(
         fluidRow(
           hidden(
             div(id = "extras",
-              hr(style = "padding-above:2px; margin:1px"),
+              # hr(style = "padding-above:2px; margin:1px"),
               column(2,
                 div(class = "slim",
                   selectInput("show_n",
