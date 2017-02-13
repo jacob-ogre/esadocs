@@ -426,9 +426,11 @@ shinyServer(function(input, output, session) {
         br(),
         fluidRow(
           column(10,
-            a(href = ifelse(!is.na(data$pdf_path[i]),
-                            make_href(data$pdf_path[i]),
-                            make_href(data$link[i])),
+            a(href = gsub(
+                ifelse(!is.na(data$pdf_path[i]),
+                       make_href(data$pdf_path[i]),
+                       make_href(data$link[i])),
+                pattern = "?", replacement = "%3F", fixed = TRUE),
               target = "_blank",
               span(
                 if(!is.null(data$title[i])) {
