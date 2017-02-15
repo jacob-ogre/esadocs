@@ -369,15 +369,17 @@ shinyServer(function(input, output, session) {
                        is.na(res_df$date) |
                        (res_df$date >= date_from() &
                         res_df$date <= date_to()))
-        if(input$type_filt != "all") {
+      if(input$type_filt != "all") {
         res_df <- filter(res_df, res_df$type == input$type_filt)
       }
       if(length(res_df[,1]) > 0) {
         return(res_df)
       } else {
+        observe(print(378))
         return(NA)
       }
     } else {
+      observe(print(382))
       return(NA)
     }
   })
@@ -602,6 +604,10 @@ shinyServer(function(input, output, session) {
       res_dft <- dplyr::arrange(cur_res(), desc(date))
     } else {
       res_dft <- cur_res()
+      if(is.na(res_dft)) {
+        observe(print("WTF"))
+        return(NULL)
+      }
     }
     if(input$min_score != 0.1) {
       res_dft <- dplyr::filter(res_dft, score >= input$min_score)
