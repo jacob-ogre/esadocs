@@ -3,16 +3,12 @@
 single_asdf <- function(res) {
   get_var <- function(d, v) {
     if(v %in% names(d$`_source`) & length(d$`_source`[[v]] > 0)) {
-      observe(print(v))
-      observe(print(length(d$`_source`[[v]])))
+      # observe(print(v))
+      # observe(print(length(d$`_source`[[v]])))
       return(d$`_source`[[v]])
     }
     return(NA)
   }
-
-  # observe(print(names(res$`_source`)))
-  # observe(print(res$`_type`))
-  # observe(print(res$`_id`))
 
   cur_dat <- data.frame(
     type = res$`_type`,
@@ -46,11 +42,13 @@ result_asdf <- function(res) {
   score_ls <- vector("list", length(res))
   res_ls <- vector("list", length(res))
   id_ls <- vector("list", length(res))
+  type_ls <- vector("list", length(res))
   for(i in 1:length(res)) {     # NOTE: lapply doesn't work for some reason
     # print((res[[i]]$`_source`))
     score_ls[[i]] <- res[[i]]$`_score`
     id_ls[[i]] <- res[[i]]$`_id`
-    type <- get_var(res[[i]]$`_source`, "type")
+    type_ls[[i]] <- res[[i]]$`_type`
+    # type <- get_var(res[[i]]$`_source`, "type")
     title <- get_var(res[[i]]$`_source`, "title")
     date <- get_var(res[[i]]$`_source`, "date")
     file_name <- get_var(res[[i]]$`_source`, "file_name")
@@ -71,8 +69,7 @@ result_asdf <- function(res) {
     spp_tmp <- paste(res[[i]]$`_source`$species[[1]], collapse = "<br>")
     geo <- paste(res[[i]]$`_source`$geo[[1]], collapse = "<br>")
     tags <- paste(res[[i]]$`_source`$tags[[1]], collapse = "<br>")
-    cur_dat <- data.frame(type = type,
-                          title = title,
+    cur_dat <- data.frame(title = title,
                           date = date,
                           file_name = file_name,
                           link = link,
@@ -96,6 +93,7 @@ result_asdf <- function(res) {
   res_df <- suppressWarnings(dplyr::bind_rows(res_ls))
   res_df$score <- unlist(score_ls)
   res_df$id <- unlist(id_ls)
+  res_df$type <- unlist(type_ls)
   return(res_df)
 }
 
@@ -139,6 +137,10 @@ test_nulls <- function(x) {
 # SERVER
 
 shinyServer(function(input, output, session) {
+
+  cancel.onSessionEnded <- session$onSessionEnded(function() {
+    index_clear_cache("esadocs", query_cache = TRUE)
+  })
 
   observeEvent(input$help, {
     showModal(
@@ -364,7 +366,7 @@ shinyServer(function(input, output, session) {
     if(length(cur_mats) > 0) {
       res_df <- result_asdf(cur_mats)
       res_df$highlight <- get_highlight(cur_mats)
-      res_df <- distinct(res_df, file_name, .keep_all = TRUE)
+      res_df <- distinct(res_df, pdf_md5, .keep_all = TRUE)
       res_df <- filter(res_df,
                        is.na(res_df$date) |
                        (res_df$date >= date_from() &
@@ -375,11 +377,9 @@ shinyServer(function(input, output, session) {
       if(length(res_df[,1]) > 0) {
         return(res_df)
       } else {
-        observe(print(378))
         return(NA)
       }
     } else {
-      observe(print(382))
       return(NA)
     }
   })
@@ -604,9 +604,10 @@ shinyServer(function(input, output, session) {
       res_dft <- dplyr::arrange(cur_res(), desc(date))
     } else {
       res_dft <- cur_res()
-      if(is.na(res_dft)) {
-        observe(print("WTF"))
-        return(NULL)
+      if(length(res_dft) == 1) {
+        if(is.na(res_dft)) {
+          return(NULL)
+        }
       }
     }
     if(input$min_score != 0.1) {
