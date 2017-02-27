@@ -16,6 +16,7 @@ body <- dashboardBody(fluidPage(
       HTML("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400'
            rel='stylesheet' type='text/css'>"),
       HTML('<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />'),
+      tags$script(src = "google_analytics.js"),
       tags$style(HTML(readLines("www/custom_styles.css"))),
       tags$script(src = "enter_button.js")
     ),
