@@ -80,6 +80,24 @@ body <- dashboardBody(fluidPage(
             ),
             fluidRow(
               helpText(htmlOutput("n_docs"))
+            ),
+            fluidRow(
+              column(4,
+                helpText(textOutput("test_hit1"))
+              ),
+              column(4,
+                helpText(textOutput("test_hit2"))
+              ),
+              column(4,
+                helpText(textOutput("test_hit3"))
+              )
+            ),
+            # fluidRow( tableOutput("test_df") )
+            column(4,
+              fluidRow( textOutput("test_out") )
+            ),
+            column(4,
+              fluidRow( textOutput("test_out2") )
             )
           ),
           column(2,

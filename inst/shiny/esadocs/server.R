@@ -38,7 +38,7 @@ single_asdf <- function(res) {
   return(cur_dat)
 }
 
-result_asdf <- function(res) {
+result_asdf <- function(res, output) {
   score_ls <- vector("list", length(res))
   res_ls <- vector("list", length(res))
   id_ls <- vector("list", length(res))
@@ -90,11 +90,18 @@ result_asdf <- function(res) {
     # names(cur_dat)[7] <- "raw_txt"
     res_ls[[i]] <- cur_dat
   }
-  res_df <- suppressWarnings(dplyr::bind_rows(res_ls))
-  res_df$score <- unlist(score_ls)
-  res_df$id <- unlist(id_ls)
-  res_df$type <- unlist(type_ls)
-  return(res_df)
+  output$test_out <- renderText({ paste("len res_ls:", 
+                                        length(score_ls),
+                                        length(id_ls),
+                                        length(type_ls)) })
+  cur_res_df <- suppressWarnings(dplyr::bind_rows(res_ls))
+  # cur_res_df <- dplyr::bind_rows(res_ls)
+  cur_res_df$score <- unlist(score_ls)
+  cur_res_df$id <- unlist(id_ls)
+  cur_res_df$type <- unlist(type_ls)
+  output$test_out2 <- renderText({ paste("dim cur_res_df:", paste(dim(cur_res_df), collapse="x")) })
+  # output$test_out2 <- renderText({ paste(names(cur_res_df), collapse = " ") })
+  return(cur_res_df)
 }
 
 get_var <- function(src, varname) {
@@ -363,19 +370,24 @@ shinyServer(function(input, output, session) {
     cur_mats <- Search("esadocs",
                        type = cur_type(),
                        body = body)$hits$hits
+    output$test_hit1 <- renderText({ length(cur_mats) })
     if(length(cur_mats) > 0) {
-      res_df <- result_asdf(cur_mats)
-      res_df$highlight <- get_highlight(cur_mats)
-      res_df <- distinct(res_df, pdf_md5, .keep_all = TRUE)
-      res_df <- filter(res_df,
-                       is.na(res_df$date) |
-                       (res_df$date >= date_from() &
-                        res_df$date <= date_to()))
+      intermed_df <- result_asdf(cur_mats, output)
+      output$test_hit2 <- renderText({ paste("376:", paste(dim(intermed_df), collapse = "x")) })
+      intermed_df$highlight <- get_highlight(cur_mats)
+      # output$test_df <- renderTable({ head(intermed_df) })
+      # output$test_df <- renderTable({ head(intermed_df) })
+      intermed_df <- distinct(intermed_df, pdf_md5, .keep_all = TRUE)
+      intermed_df <- filter(intermed_df,
+                       is.na(intermed_df$date) |
+                       (intermed_df$date >= date_from() &
+                        intermed_df$date <= date_to()))
       if(input$type_filt != "all") {
-        res_df <- filter(res_df, res_df$type == input$type_filt)
+        intermed_df <- filter(intermed_df, intermed_df$type == input$type_filt)
       }
-      if(length(res_df[,1]) > 0) {
-        return(res_df)
+      if(length(intermed_df[,1]) > 0) {
+        output$test_hit3 <- renderText({ paste(dim(intermed_df), collapse = "x") })
+        return(intermed_df)
       } else {
         return(NA)
       }
