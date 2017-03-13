@@ -44,7 +44,6 @@ result_asdf <- function(res, output) {
   id_ls <- vector("list", length(res))
   type_ls <- vector("list", length(res))
   for(i in 1:length(res)) {     # NOTE: lapply doesn't work for some reason
-    # print((res[[i]]$`_source`))
     score_ls[[i]] <- res[[i]]$`_score`
     id_ls[[i]] <- res[[i]]$`_id`
     type_ls[[i]] <- res[[i]]$`_type`
@@ -95,12 +94,9 @@ result_asdf <- function(res, output) {
                                         length(id_ls),
                                         length(type_ls)) })
   cur_res_df <- suppressWarnings(dplyr::bind_rows(res_ls))
-  # cur_res_df <- dplyr::bind_rows(res_ls)
   cur_res_df$score <- unlist(score_ls)
   cur_res_df$id <- unlist(id_ls)
   cur_res_df$type <- unlist(type_ls)
-  output$test_out2 <- renderText({ paste("dim cur_res_df:", paste(dim(cur_res_df), collapse="x")) })
-  # output$test_out2 <- renderText({ paste(names(cur_res_df), collapse = " ") })
   return(cur_res_df)
 }
 
@@ -370,23 +366,11 @@ shinyServer(function(input, output, session) {
     cur_mats <- Search("esadocs",
                        type = cur_type(),
                        body = body)$hits$hits
-    output$test_hit1 <- renderText({ length(cur_mats) })
     if(length(cur_mats) > 0) {
       intermed_df <- result_asdf(cur_mats, output)
-      output$test_hit2 <- renderText({ paste("376:", paste(dim(intermed_df), collapse = "x")) })
       intermed_df$highlight <- get_highlight(cur_mats)
-      # output$test_df <- renderTable({ head(intermed_df) })
-      # output$test_df <- renderTable({ head(intermed_df) })
-      intermed_df <- distinct(intermed_df, pdf_md5, .keep_all = TRUE)
-      intermed_df <- filter(intermed_df,
-                       is.na(intermed_df$date) |
-                       (intermed_df$date >= date_from() &
-                        intermed_df$date <= date_to()))
-      if(input$type_filt != "all") {
-        intermed_df <- filter(intermed_df, intermed_df$type == input$type_filt)
-      }
+      intermed_df <- distinct(intermed_df, file_name, .keep_all = TRUE)
       if(length(intermed_df[,1]) > 0) {
-        output$test_hit3 <- renderText({ paste(dim(intermed_df), collapse = "x") })
         return(intermed_df)
       } else {
         return(NA)
