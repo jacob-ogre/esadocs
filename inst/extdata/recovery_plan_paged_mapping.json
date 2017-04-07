@@ -58,10 +58,6 @@
         "type": "keyword",
         "index": "not_analyzed"
       },
-      "n_pages": {
-        "type": "long",
-        "index": "not_analyzed"
-      },
       "species": {
         "type": "keyword",
         "index": "not_analyzed"

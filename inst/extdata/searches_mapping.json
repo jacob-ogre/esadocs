@@ -1,0 +1,14 @@
+{
+  "basic": {
+    "properties": {
+      "search_term": {
+        "type": "keyword",
+        "index": "not_analyzed"
+      },
+      "date": {
+        "type": "date",
+        "index": "not_analyzed"
+      }
+    }
+  }
+}
