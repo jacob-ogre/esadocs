@@ -3,19 +3,19 @@
     "properties": {
       "search_term": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "count":{
         "type": "integer",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "rds_path": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "date": {
         "type": "date",
-        "index": "not_analyzed"
+        "index": "false"
       }
     }
   }

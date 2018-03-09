@@ -3,11 +3,11 @@
     "properties": {
       "search_term": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "date": {
         "type": "date",
-        "index": "not_analyzed"
+        "index": "false"
       }
     }
   }

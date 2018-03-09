@@ -34,6 +34,12 @@ settings <- make_es_settings(analyzer = c(analyzer_json),
                                policy_json,
                                recplan_json
                              ))
+settings <- make_es_settings(analyzer = c(analyzer_json),
+                             mappings = c(
+                               candid_json,
+                               consag_json
+                             )
+)
 
 connect()
 if(index_exists("esadocs")) {
@@ -59,15 +65,21 @@ ls()
 # 3. A function to load the text to the data.frames
 
 get_txt <- function(df) {
-  read_txt <- function(f) { paste(readLines(f), collapse = "\n") }
+  read_txt <- function(f) {
+    res <- try(paste(readLines(f), collapse = "\n"))
+    if(class(res) == "try-error") res <- ""
+    res
+  }
   texts <- lapply(df$txt_path, read_txt)
   df$raw_txt <- unlist(texts)
   return(df)
 }
 
 subset_df <- function(df, type) {
-  cur_path <- file.path("/home/jacobmalcom/Data/ESAdocs", type)
+  cur_path <- file.path("/home/cci/Data/ESAdocs/text", type)
+  print(cur_path)
   type_fils <- list.files(cur_path, full.names = TRUE)
+  print(length(type_fils))
   subd <- dplyr::filter(df, pdf_path %in% type_fils)
   return(subd)
 }
@@ -75,16 +87,21 @@ subset_df <- function(df, type) {
 load_to_es <- function(df, index = "esadocs", type) {
   df$pdf_path <- gsub(df$pdf_path,
                       pattern = "https://defend-esc-dev.org",
-                      replacement = "/home/jacobmalcom/Data")
+                      replacement = "/home/cci/Data")
   df$txt_path <- gsub(df$txt_path,
-                      pattern = "https://defend-esc-dev.org",
-                      replacement = "/home/jacobmalcom/Data")
+                      pattern = "https://defend-esc-dev.org/ESAdocs_text",
+                      replacement = "/home/cci/Data/ESAdocs/text")
+  df$txt_path <- gsub(df$txt_path,
+                      pattern = "/home/jacobmalcom/Data/ESAdocs_text",
+                      replacement = "/home/cci/Data/ESAdocs/text")
   df$txt_path <- gsub(df$txt_path,
                       pattern = "pdf$|PDF$",
                       replacement = "txt")
-  sub <- subset_df(df, type)
+  # sub <- subset_df(df, type)
+  sub <- df
+  # print(dim(sub))
   sub$pdf_path <- gsub(sub$pdf_path,
-                       pattern = "/home/jacobmalcom/Data",
+                       pattern = "/home/cci/Data",
                        replacement = "https://esadocs.cci-dev.org")
   connect()
   brks <- seq(1, dim(sub)[1], 100)

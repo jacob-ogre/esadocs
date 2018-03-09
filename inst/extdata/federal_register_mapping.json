@@ -3,39 +3,39 @@
     "properties": {
       "link": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "type": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "date": {
         "type": "date",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "fr_citation_page": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "title": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "file_name": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "pdf_path": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "txt_path": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "raw_txt": {
         "type": "text",
-        "index": "analyzed",
+        "index": "true",
         "term_vector": "with_positions_offsets",
         "analyzer": "esadocs_analyzer",
         "fields": {
@@ -48,23 +48,23 @@
       },
       "pdf_md5": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "n_pages": {
         "type": "long",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "species": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "geo": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       },
       "tags": {
         "type": "keyword",
-        "index": "not_analyzed"
+        "index": "false"
       }
     }
   }
